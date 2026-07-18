@@ -1,0 +1,142 @@
+# Mahjong Tournament Support System Requirements
+
+Version: 0.1.0\
+Status: Draft
+
+## 1. Project Overview
+
+### Purpose
+
+本システムは、リアル麻雀大会の運営を支援するWebアプリケーションである。
+
+目的は以下のとおり。
+
+-   スマートフォンから複数人が同時に結果入力できること
+-   素点からウマ・オカを自動計算すること
+-   リアルタイム順位を表示すること
+-   大会終了後はGitHub Pagesのみで過去大会を閲覧できること
+-   Excel運用を置き換えること
+
+## 2. Development Principles
+
+-   データモデルを最優先に設計する
+-   GitHub Pagesを大会後の公開基盤とする
+-   大会中のみSupabaseを利用する
+-   Archiveを長期保存の正本とする
+-   React + TypeScriptをフロントエンドの標準とする
+-   Pythonは運営ツール（Excel変換・暗号化等）に利用する
+-   Codexとの協調開発を前提とする
+
+## 3. System Overview
+
+### Tournament Mode
+
+-   GitHub Pages
+-   React
+-   Supabase
+-   Realtime
+-   PostgreSQL
+
+### Archive Mode
+
+-   GitHub Pages
+-   暗号化JSON
+-   Browser Decryption
+-   Statistics
+
+## 4. Scope
+
+### In Scope
+
+-   大会管理
+-   参加者管理
+-   麻雀結果入力
+-   サブゲーム入力
+-   リアルタイム順位
+-   統計表示
+-   個人成績
+-   同卓履歴
+-   次卓候補
+-   JSON Archive
+-   暗号化
+-   GitHub Pages公開
+
+### Out of Scope
+
+-   オンライン麻雀
+-   会計
+-   SNS連携
+-   Push通知
+-   高度なユーザー別認可
+
+## 5. Technology Stack
+
+### Frontend
+
+-   React
+-   TypeScript
+-   Vite
+
+### Backend
+
+-   Supabase
+-   PostgreSQL
+-   Realtime
+-   RLS
+
+### Tools
+
+-   Python
+-   Excel Importer
+-   Archive Encryptor
+-   JSON Validator
+
+## 6. Functional Requirements（概要）
+
+FR-001 大会作成
+
+FR-002 参加者登録
+
+FR-003 麻雀ルール設定
+
+FR-004 卓結果入力
+
+FR-005 得点自動計算
+
+FR-006 リアルタイム順位
+
+FR-007 サブゲーム入力
+
+FR-008 結果訂正
+
+FR-009 アーカイブ生成
+
+FR-010 過去大会閲覧
+
+## 7. Archive Policy
+
+-   大会終了後はJSONへエクスポートする
+-   AES-256-GCMで暗号化する
+-   GitHubには暗号化ファイルのみ配置する
+-   復号はブラウザ内で実施する
+-   平文JSONはGitへコミットしない
+
+## 8. Design Principles
+
+-   Player IDと表示名を分離
+-   得点計算ロジックをUIから分離
+-   オンライン・アーカイブで同じ集計ロジックを利用
+-   JSON SchemaをSingle Source of Truthとする
+
+## 9. Success Criteria
+
+-   Excel運用を廃止できる
+-   次回大会で実運用できる
+-   GitHub Pagesで過去大会を閲覧できる
+-   複数人同時入力できる
+-   リアルタイム順位表示できる
+
+------------------------------------------------------------------------
+
+> 本書は初版であり、今後 architecture.md および development-plan.md
+> にて詳細設計・実装計画を定義する。
