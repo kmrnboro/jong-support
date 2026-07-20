@@ -1,0 +1,638 @@
+:root {
+  font-family:
+    Inter, "Noto Sans JP", "Yu Gothic UI", "Hiragino Sans", sans-serif;
+  color: #1f2925;
+  background: #f4f1e8;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 85% 5%, rgb(155 95 45 / 9%), transparent 24rem),
+    #f4f1e8;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:focus-visible,
+.table-scroll:focus-visible {
+  outline: 3px solid rgb(155 95 45 / 55%);
+  outline-offset: 3px;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.site-header {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  padding: 0.85rem clamp(1rem, 4vw, 3rem);
+  border-bottom: 1px solid rgb(216 210 194 / 85%);
+  background: rgb(244 241 232 / 92%);
+  backdrop-filter: blur(12px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: 0.65rem;
+  color: #fff;
+  background: #173f35;
+  font-family: serif;
+  font-size: 1.35rem;
+}
+
+.brand strong,
+.brand small {
+  display: block;
+}
+
+.brand strong {
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.brand small {
+  margin-top: 0.1rem;
+  color: #6a736f;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.page-container {
+  width: min(100% - 2rem, 68rem);
+  margin: 0 auto;
+  padding: clamp(2.75rem, 7vw, 6rem) 0;
+  flex: 1;
+}
+
+.hero,
+.page-stack {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.eyebrow,
+.card-label {
+  margin: 0;
+  color: #9b5f2d;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  max-width: 15em;
+  margin-bottom: 0;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: clamp(2.2rem, 8vw, 4.8rem);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.035em;
+}
+
+h2 {
+  margin-bottom: 0;
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+}
+
+.lead {
+  max-width: 42rem;
+  margin-bottom: 1rem;
+  color: #57615d;
+  font-size: clamp(1rem, 2.2vw, 1.15rem);
+  line-height: 1.9;
+}
+
+.tournament-card,
+.ranking-card,
+.point-summary,
+.content-card,
+.message-card {
+  border: 1px solid #d8d2c2;
+  border-radius: 1rem;
+  background: #fffdf8;
+  box-shadow: 0 1rem 3rem rgb(38 50 45 / 8%);
+}
+
+.tournament-card {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: clamp(1.35rem, 4vw, 2.25rem);
+}
+
+.tournament-card h2 {
+  margin: 0.55rem 0 1.5rem;
+}
+
+.tournament-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 2rem;
+  margin: 0;
+}
+
+.tournament-meta div {
+  min-width: 5rem;
+}
+
+.tournament-meta dt,
+.point-grid dt,
+.statistics-grid dt {
+  color: #747c78;
+  font-size: 0.75rem;
+}
+
+.tournament-meta dd {
+  margin: 0.25rem 0 0;
+  font-weight: 700;
+}
+
+.primary-link {
+  min-width: max-content;
+  padding: 0.9rem 1.2rem;
+  border-radius: 0.65rem;
+  color: #fff;
+  background: #173f35;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.primary-link:hover,
+.primary-link:focus-visible {
+  background: #245b4d;
+}
+
+.page-heading,
+.player-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.page-heading h1,
+.player-heading h1,
+.message-card h1,
+.content-card h1 {
+  margin-top: 0.55rem;
+  font-size: clamp(2rem, 6vw, 3.7rem);
+}
+
+.page-summary,
+.player-id {
+  display: flex;
+  gap: 0.45rem;
+  margin: 0.8rem 0 0;
+  color: #66706c;
+  font-size: 0.9rem;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+}
+
+.section-heading h2 {
+  margin-top: 0.45rem;
+}
+
+.section-heading > p {
+  max-width: 22rem;
+  margin-bottom: 0;
+  color: #69716e;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.compact-heading {
+  padding: 0 0 1rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border-radius: 0 0 1rem 1rem;
+}
+
+.ranking-table {
+  width: 100%;
+  min-width: 36rem;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.ranking-table th,
+.ranking-table td {
+  padding: 0.85rem 1rem;
+  border-top: 1px solid #e5e0d4;
+  text-align: right;
+}
+
+.ranking-table thead th {
+  color: #727b77;
+  background: #f7f3ea;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.ranking-table th:first-child,
+.ranking-table td:first-child {
+  width: 4.5rem;
+  text-align: center;
+}
+
+.ranking-table th:nth-child(2) {
+  text-align: left;
+}
+
+.ranking-table tbody th {
+  font-size: 0.95rem;
+}
+
+.ranking-table tbody th a {
+  color: #205347;
+  text-underline-offset: 0.25em;
+}
+
+.ranking-table tbody tr:hover {
+  background: #fbf8f0;
+}
+
+.rank-number {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  color: #43504b;
+  background: #eee9dc;
+  font-weight: 800;
+}
+
+.ranking-table tbody tr:first-child .rank-number {
+  color: #3e2e09;
+  background: #e7c96f;
+}
+
+.ranking-table tbody tr:nth-child(2) .rank-number {
+  background: #d9dddc;
+}
+
+.ranking-table tbody tr:nth-child(3) .rank-number {
+  color: #fff;
+  background: #a96d46;
+}
+
+.point-value {
+  color: #53605b;
+}
+
+.point-total {
+  color: #1d453b;
+  font-weight: 800;
+}
+
+.official-rank {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  min-width: 8rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid #d8d2c2;
+  border-radius: 0.85rem;
+  background: #fffdf8;
+  text-align: right;
+}
+
+.official-rank span {
+  grid-column: 1 / -1;
+  color: #747c78;
+  font-size: 0.72rem;
+}
+
+.official-rank strong {
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 2.7rem;
+  line-height: 1;
+}
+
+.official-rank small {
+  margin-left: 0.25rem;
+  font-weight: 700;
+}
+
+.point-summary {
+  padding: clamp(1.25rem, 4vw, 2rem);
+}
+
+.point-grid,
+.statistics-grid {
+  display: grid;
+  margin: 0;
+}
+
+.point-grid {
+  grid-template-columns: 1.3fr repeat(2, 1fr);
+  border-top: 1px solid #e5e0d4;
+}
+
+.point-grid div {
+  padding: 1.25rem 1rem 0.25rem;
+}
+
+.point-grid div + div {
+  border-left: 1px solid #e5e0d4;
+}
+
+.point-grid dd,
+.statistics-grid dd {
+  margin: 0.35rem 0 0;
+  color: #234a40;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.point-grid-total dd {
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+}
+
+.statistics-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.statistics-grid div {
+  padding: 1.25rem;
+  border: 1px solid #d8d2c2;
+  border-radius: 0.85rem;
+  background: rgb(255 253 248 / 72%);
+}
+
+.statistics-grid small {
+  margin-left: 0.2rem;
+  color: #6f7773;
+  font-size: 0.7rem;
+}
+
+.content-card,
+.message-card {
+  padding: clamp(1.5rem, 6vw, 3rem);
+}
+
+.content-card > p,
+.message-card > p:last-child {
+  max-width: 40rem;
+  margin-bottom: 0;
+  color: #68716d;
+  line-height: 1.75;
+}
+
+.text-link {
+  display: inline-block;
+  width: fit-content;
+  color: #265f50;
+  font-weight: 700;
+  text-underline-offset: 0.25em;
+}
+
+.text-link-top {
+  margin-bottom: 0.65rem;
+  min-width: max-content;
+}
+
+.unlock-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 25rem);
+  gap: clamp(1.5rem, 5vw, 4.5rem);
+  align-items: center;
+  min-height: 30rem;
+}
+
+.unlock-intro h1 {
+  margin: 0.45rem 0 1rem;
+  color: #1f332d;
+  font-size: clamp(2rem, 6vw, 3.8rem);
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.unlock-description,
+.privacy-note {
+  color: #68716d;
+  line-height: 1.75;
+}
+
+.unlock-card {
+  padding: clamp(1.4rem, 4vw, 2rem);
+  border: 1px solid #ded9cd;
+  border-radius: 1rem;
+  background: #fffdf8;
+  box-shadow: 0 1rem 2.5rem rgb(31 51 45 / 8%);
+}
+
+.unlock-card h2 {
+  margin-top: 0;
+  color: #1f332d;
+}
+
+.unlock-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.unlock-form label {
+  color: #33473f;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.unlock-form input {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid #b9c0bc;
+  border-radius: 0.55rem;
+  background: #fff;
+  color: #1f332d;
+  font: inherit;
+}
+
+.unlock-form input:focus-visible {
+  outline: 3px solid rgb(38 95 80 / 22%);
+  border-color: #265f50;
+}
+
+.primary-button {
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-radius: 0.55rem;
+  background: #265f50;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.primary-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.form-error {
+  margin: 0;
+  color: #9b3028;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.privacy-note {
+  margin: 1rem 0 0;
+  font-size: 0.78rem;
+}
+
+.site-footer {
+  padding: 1.2rem 1rem;
+  color: #737b77;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 42rem) {
+  .page-container {
+    width: min(100% - 1.25rem, 68rem);
+    padding-top: 2rem;
+  }
+
+  .tournament-card,
+  .page-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .primary-link {
+    text-align: center;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ranking-card {
+    margin-inline: -0.625rem;
+    border-radius: 0.7rem;
+  }
+
+  .ranking-table th,
+  .ranking-table td {
+    padding: 0.75rem;
+  }
+
+  .player-heading {
+    align-items: flex-start;
+  }
+
+  .official-rank {
+    min-width: 6.5rem;
+    padding: 0.8rem 1rem;
+  }
+
+  .official-rank strong {
+    font-size: 2.2rem;
+  }
+
+  .point-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .point-grid-total {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid #e5e0d4;
+  }
+
+  .point-grid div:nth-child(2) {
+    border-left: 0;
+  }
+
+  .statistics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .unlock-layout {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 24rem) {
+  .player-heading {
+    flex-direction: column;
+  }
+
+  .official-rank {
+    width: 100%;
+  }
+
+  .statistics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .primary-link,
+  .primary-button {
+    transition: background-color 160ms ease;
+  }
+}

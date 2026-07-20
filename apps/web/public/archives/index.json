@@ -1,0 +1,14 @@
+{
+  "archives": [
+    {
+      "archiveId": "2026-sample",
+      "title": "2026年度大会（匿名化サンプル）",
+      "date": "2026-07-01",
+      "revision": 1,
+      "file": "archives/2026-sample.enc",
+      "formatVersion": 1,
+      "playerCount": 10,
+      "gameCount": 4
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+name: Verify and deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Reject tracked Excel files
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked_files="$(git ls-files -- '*.xlsx' '*.XLSX')"
+          if [[ -n "$tracked_files" ]]; then
+            echo "Tracked Excel files are not allowed:"
+            echo "$tracked_files"
+            exit 1
+          fi
+
+      - name: Validate public archive files
+        shell: bash
+        run: |
+          set -euo pipefail
+          unexpected_json="$(find apps/web/public -type f -iname '*.json' ! -path 'apps/web/public/archives/index.json' -print)"
+          if [[ -n "$unexpected_json" ]]; then
+            echo "Only the non-secret archive index may be public JSON:"
+            echo "$unexpected_json"
+            exit 1
+          fi
+
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+          import path from "node:path";
+
+          const indexPath = "apps/web/public/archives/index.json";
+          const index = JSON.parse(fs.readFileSync(indexPath, "utf8"));
+          if (!index || !Array.isArray(index.archives) || index.archives.length === 0) {
+            throw new Error("archives/index.json must contain a non-empty archives array");
+          }
+
+          for (const archive of index.archives) {
+            const isValidEntry =
+              archive &&
+              typeof archive.archiveId === "string" &&
+              typeof archive.title === "string" &&
+              typeof archive.date === "string" &&
+              Number.isInteger(archive.revision) &&
+              archive.formatVersion === 1 &&
+              typeof archive.file === "string" &&
+              archive.file.startsWith("archives/") &&
+              archive.file.endsWith(".enc");
+            if (!isValidEntry) {
+              throw new Error("Archive index contains an invalid entry");
+            }
+
+            const encryptedPath = path.join("apps/web/public", archive.file);
+            if (!fs.existsSync(encryptedPath)) {
+              throw new Error(`Encrypted archive is missing: ${encryptedPath}`);
+            }
+          }
+          NODE
+
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Lint
+        working-directory: apps/web
+        run: npm run lint
+
+      - name: Typecheck
+        working-directory: apps/web
+        run: npm run typecheck
+
+      - name: Test
+        working-directory: apps/web
+        run: npm test
+
+      - name: Build
+        working-directory: apps/web
+        run: npm run build
+
+      - name: Inspect production artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if find apps/web/dist -type f -iname '*.xlsx' -print -quit | grep -q .; then
+            echo "Excel files must not be included in the production artifact."
+            exit 1
+          fi
+
+          if find apps/web/dist \( -path '*/data/raw' -o -path '*/data/raw/*' -o -path '*/data/plain' -o -path '*/data/plain/*' \) -print -quit | grep -q .; then
+            echo "data/raw or data/plain must not be included in the production artifact."
+            exit 1
+          fi
+
+          unexpected_json="$(find apps/web/dist -type f -iname '*.json' ! -path 'apps/web/dist/archives/index.json' -print)"
+          if [[ -n "$unexpected_json" ]]; then
+            echo "Plaintext or unexpected JSON was found in the production artifact:"
+            echo "$unexpected_json"
+            exit 1
+          fi
+
+          test -f apps/web/dist/archives/index.json
+          test -n "$(find apps/web/dist/archives -type f -name '*.enc' -print -quit)"
+          grep -q '/jong-support/assets/' apps/web/dist/index.html
+
+      - name: Configure GitHub Pages
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
+
+      - name: Upload GitHub Pages artifact
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        with:
+          path: apps/web/dist
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5

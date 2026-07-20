@@ -1,1 +1,16 @@
-data/
+data/raw/
+data/plain/
+*.xlsx
+*.decrypted.json
+.env*
+
+node_modules/
+dist/
+coverage/
+*.local
+*.log
+
+.venv/
+__pycache__/
+.pytest_cache/
+*.egg-info/

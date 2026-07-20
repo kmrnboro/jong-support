@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "0.1.0",
+  "tournament": {
+    "id": "2026-sample",
+    "name": "2026年度大会（匿名化サンプル）",
+    "date": "2026-07-01"
+  },
+  "players": [
+    { "playerId": "P001", "nickname": "Player A" },
+    { "playerId": "P002", "nickname": "Player B" },
+    { "playerId": "P003", "nickname": "Player C" },
+    { "playerId": "P004", "nickname": "Player D" },
+    { "playerId": "P005", "nickname": "Player E" },
+    { "playerId": "P006", "nickname": "Player F" },
+    { "playerId": "P007", "nickname": "Player G" },
+    { "playerId": "P008", "nickname": "Player H" },
+    { "playerId": "P009", "nickname": "Player I" },
+    { "playerId": "P010", "nickname": "Player J" }
+  ],
+  "games": [
+    {
+      "gameId": "R01-T01",
+      "roundNumber": 1,
+      "tableNumber": 1,
+      "results": [
+        { "playerId": "P001", "rawScore": 30200, "rank": 1, "finalPoint": 33 },
+        { "playerId": "P007", "rawScore": 24400, "rank": 2, "finalPoint": -7 },
+        { "playerId": "P004", "rawScore": 23900, "rank": 3, "finalPoint": -9 },
+        { "playerId": "P008", "rawScore": 21500, "rank": 4, "finalPoint": -17 }
+      ]
+    },
+    {
+      "gameId": "R01-T02",
+      "roundNumber": 1,
+      "tableNumber": 2,
+      "results": [
+        { "playerId": "P006", "rawScore": 51200, "rank": 1, "finalPoint": 53 },
+        { "playerId": "P003", "rawScore": 29700, "rank": 2, "finalPoint": -1 },
+        { "playerId": "P005", "rawScore": 20200, "rank": 3, "finalPoint": -13 },
+        { "playerId": "P010", "rawScore": -1100, "rank": 4, "finalPoint": -39 }
+      ]
+    },
+    {
+      "gameId": "R02-T01",
+      "roundNumber": 2,
+      "tableNumber": 1,
+      "results": [
+        { "playerId": "P004", "rawScore": 34300, "rank": 1, "finalPoint": 36 },
+        { "playerId": "P005", "rawScore": 29100, "rank": 2, "finalPoint": -2 },
+        { "playerId": "P008", "rawScore": 23000, "rank": 3, "finalPoint": -10 },
+        { "playerId": "P003", "rawScore": 13600, "rank": 4, "finalPoint": -24 }
+      ]
+    },
+    {
+      "gameId": "R02-T02",
+      "roundNumber": 2,
+      "tableNumber": 2,
+      "results": [
+        { "playerId": "P006", "rawScore": 34000, "rank": 1, "finalPoint": 35 },
+        { "playerId": "P009", "rawScore": 24700, "rank": 2, "finalPoint": -6 },
+        { "playerId": "P010", "rawScore": 23600, "rank": 3, "finalPoint": -9 },
+        { "playerId": "P002", "rawScore": 17700, "rank": 4, "finalPoint": -20 }
+      ]
+    }
+  ],
+  "officialResults": [
+    { "playerId": "P006", "mahjongPoint": 88, "subgamePoint": 0, "totalPoint": 88, "rank": 1 },
+    { "playerId": "P001", "mahjongPoint": 33, "subgamePoint": 0, "totalPoint": 33, "rank": 2 },
+    { "playerId": "P004", "mahjongPoint": 27, "subgamePoint": 0, "totalPoint": 27, "rank": 3 },
+    { "playerId": "P009", "mahjongPoint": -6, "subgamePoint": 0, "totalPoint": -6, "rank": 4 },
+    { "playerId": "P007", "mahjongPoint": -7, "subgamePoint": 0, "totalPoint": -7, "rank": 5 },
+    { "playerId": "P005", "mahjongPoint": -15, "subgamePoint": 0, "totalPoint": -15, "rank": 6 },
+    { "playerId": "P002", "mahjongPoint": -20, "subgamePoint": 0, "totalPoint": -20, "rank": 7 },
+    { "playerId": "P003", "mahjongPoint": -25, "subgamePoint": 0, "totalPoint": -25, "rank": 8 },
+    { "playerId": "P008", "mahjongPoint": -27, "subgamePoint": 0, "totalPoint": -27, "rank": 9 },
+    { "playerId": "P010", "mahjongPoint": -48, "subgamePoint": 0, "totalPoint": -48, "rank": 10 }
+  ]
+}
