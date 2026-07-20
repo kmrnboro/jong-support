@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 
+import { buildStatisticsPath } from "../archive/routes";
 import { createOfficialRanking } from "../domain/ranking";
 import type { TournamentArchive } from "../domain/archive";
 import { RankingTable } from "../components/RankingTable";
@@ -29,13 +30,14 @@ export function ArchivePage({ archive }: ArchivePageProps) {
     );
   }
 
-  const ranking = createOfficialRanking(archive);
+  const mahjongRanking = createOfficialRanking(archive, "mahjong");
+  const subgameRanking = createOfficialRanking(archive, "subgame");
 
   return (
     <div className="page-stack">
       <header className="page-heading">
         <div>
-          <p className="eyebrow">FINAL RANKING</p>
+          <p className="eyebrow">OFFICIAL RESULTS</p>
           <h1 id="archive-title">{archive.tournament.name}</h1>
           <p className="page-summary">
             <time dateTime={archive.tournament.date}>
@@ -45,21 +47,49 @@ export function ArchivePage({ archive }: ArchivePageProps) {
             {archive.players.length}名
           </p>
         </div>
-        <Link className="text-link text-link-top" to="/">
-          大会トップへ
-        </Link>
+        <div className="page-actions">
+          <Link
+            className="primary-link"
+            to={buildStatisticsPath(archive.tournament.id)}
+          >
+            比較統計を見る
+          </Link>
+          <Link className="text-link" to="/">
+            大会トップへ
+          </Link>
+        </div>
       </header>
 
-      <section className="ranking-card" aria-labelledby="ranking-title">
-        <div className="section-heading">
-          <div>
-            <p className="card-label">OFFICIAL RESULTS</p>
-            <h2 id="ranking-title">最終順位</h2>
+      <div className="ranking-grid">
+        <section className="ranking-card" aria-labelledby="mahjong-ranking-title">
+          <div className="section-heading">
+            <div>
+              <p className="card-label">MAHJONG</p>
+              <h2 id="mahjong-ranking-title">麻雀順位</h2>
+            </div>
           </div>
-          <p>プレイヤー名を選ぶと個人成績を確認できます。</p>
-        </div>
-        <RankingTable rows={ranking} />
-      </section>
+          <RankingTable rows={mahjongRanking} label="麻雀" />
+        </section>
+
+        <section className="ranking-card" aria-labelledby="subgame-ranking-title">
+          <div className="section-heading">
+            <div>
+              <p className="card-label">SUBGAME</p>
+              <h2 id="subgame-ranking-title">
+                サブゲーム順位
+                {archive.subgameDataStatus === "sample" ? "（仮）" : ""}
+              </h2>
+            </div>
+          </div>
+          <RankingTable rows={subgameRanking} label="サブゲーム" />
+        </section>
+      </div>
+
+      {archive.subgameDataStatus === "sample" ? (
+        <p className="sample-note">
+          サブゲームは画面確認用の仮データです。実データ受領後に差し替えます。
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import type { MahjongGame } from "./archive";
-import { calculatePlayerStatistics } from "./statistics";
+import type { MahjongGame, Player, SubgameResult } from "./archive";
+import {
+  calculateMahjongProgressions,
+  calculatePlayerStatistics,
+  calculateSubgameProgressions,
+} from "./statistics";
 
 const games: MahjongGame[] = [
   {
@@ -28,6 +32,18 @@ const games: MahjongGame[] = [
   },
 ];
 
+const players: Player[] = [
+  { playerId: "P001", nickname: "Player A" },
+  { playerId: "P002", nickname: "Player B" },
+];
+
+const subgameResults: SubgameResult[] = [
+  { roundNumber: 1, playerId: "P001", point: 4 },
+  { roundNumber: 1, playerId: "P002", point: -2 },
+  { roundNumber: 2, playerId: "P001", point: -1 },
+  { roundNumber: 2, playerId: "P002", point: 5 },
+];
+
 describe("calculatePlayerStatistics", () => {
   it("gamesから対局数、平均順位、トップ率、ラス率を計算する", () => {
     expect(calculatePlayerStatistics("P001", games)).toEqual({
@@ -50,3 +66,50 @@ describe("calculatePlayerStatistics", () => {
   });
 });
 
+describe("point progressions", () => {
+  it("麻雀ptを回ごとに累積する", () => {
+    expect(calculateMahjongProgressions(players, games)).toEqual([
+      {
+        playerId: "P001",
+        nickname: "Player A",
+        points: [
+          { roundNumber: 0, point: 0 },
+          { roundNumber: 1, point: 30 },
+          { roundNumber: 2, point: 0 },
+        ],
+      },
+      {
+        playerId: "P002",
+        nickname: "Player B",
+        points: [
+          { roundNumber: 0, point: 0 },
+          { roundNumber: 1, point: 10 },
+          { roundNumber: 2, point: 45 },
+        ],
+      },
+    ]);
+  });
+
+  it("サブゲームptを回ごとに累積する", () => {
+    expect(calculateSubgameProgressions(players, subgameResults)).toEqual([
+      {
+        playerId: "P001",
+        nickname: "Player A",
+        points: [
+          { roundNumber: 0, point: 0 },
+          { roundNumber: 1, point: 4 },
+          { roundNumber: 2, point: 3 },
+        ],
+      },
+      {
+        playerId: "P002",
+        nickname: "Player B",
+        points: [
+          { roundNumber: 0, point: 0 },
+          { roundNumber: 1, point: -2 },
+          { roundNumber: 2, point: 3 },
+        ],
+      },
+    ]);
+  });
+});

@@ -3,15 +3,19 @@
 リアル麻雀大会の過去結果を閲覧する Archive Viewer です。
 
 現在は週末MVPの暗号化Archive Viewerとして、ブラウザ内でArchiveを復号し、
-匿名化サンプル大会のトップ、最終順位、個人成績を閲覧できます。パスワードは
+匿名化サンプル大会のトップ、部門別順位、比較統計を閲覧できます。パスワードは
 画面のメモリ内だけで扱い、送信・永続化しません。大会中の入力機能や
 Supabase連携は、このスコープには含みません。
 
 表示内容:
 
-- `officialResults`による公式順位
-- 総合pt、麻雀pt、サブゲームpt
-- 対局数、平均順位、トップ率、ラス率
+- `officialResults`による麻雀・サブゲーム別の順位（総合ptなし）
+- 全参加者を重ねた麻雀pt・サブゲームptの回別推移
+- プレイヤーごとのグラフ表示切替
+- 全参加者の対局数、平均順位、トップ率、ラス率の比較
+
+現在のサブゲーム結果は画面確認用の仮データです。Archive内の
+`subgameDataStatus`を`sample`として保持し、画面にも仮データであることを表示します。
 
 ## 必要な環境
 
@@ -34,8 +38,8 @@ npm run dev
 
 `http://localhost:5173/jong-support/` をブラウザで開きます。
 ルーティングにはHash Routerを使用するため、
-順位画面は `/jong-support/#/archive/<archiveId>`、個人成績は
-`/jong-support/#/player/<playerId>` 形式です。
+順位画面は `/jong-support/#/archive/<archiveId>`、比較統計は
+`/jong-support/#/archive/<archiveId>/statistics` 形式です。
 
 匿名化された互換fixtureを画面で確認する場合のパスワードは
 `weekend-mvp-2026` です。これはテスト専用であり、実大会では使用しないでください。
@@ -116,8 +120,8 @@ python -m pytest
 apps/web/
   src/
     archive/     暗号Archiveの取得・ブラウザ内復号・最小構造検証
-    components/  画面共通コンポーネント・順位表
-    domain/      Reactに依存しないモデル・順位・統計ロジック
+    components/  画面共通コンポーネント・順位表・SVGグラフ
+    domain/      Reactに依存しないモデル・部門別順位・統計ロジック
     pages/       ルート単位の画面
 ```
 

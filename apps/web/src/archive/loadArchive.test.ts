@@ -3,6 +3,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import encryptedArchiveText from "../../public/archives/2026-sample.enc?raw";
 import plainArchive from "../../../../tests/fixtures/archive.json";
 import {
+  calculateMahjongProgressions,
+  calculateSubgameProgressions,
+} from "../domain/statistics";
+import {
   ArchiveDecryptionError,
   type EncryptedArchiveEnvelope,
 } from "./decrypt";
@@ -30,6 +34,33 @@ describe("Archive validation", () => {
     ).toEqual(plainArchive);
   });
 
+  it("各部門の最終累積ptが公式結果と一致する", () => {
+    const archive = parseArchive(
+      new TextEncoder().encode(JSON.stringify(plainArchive)),
+    );
+    const mahjongProgressions = calculateMahjongProgressions(
+      archive.players,
+      archive.games,
+    );
+    const subgameProgressions = calculateSubgameProgressions(
+      archive.players,
+      archive.subgameResults,
+    );
+
+    for (const result of archive.officialResults) {
+      expect(
+        mahjongProgressions
+          .find((item) => item.playerId === result.playerId)
+          ?.points.at(-1)?.point,
+      ).toBe(result.mahjongPoint);
+      expect(
+        subgameProgressions
+          .find((item) => item.playerId === result.playerId)
+          ?.points.at(-1)?.point,
+      ).toBe(result.subgamePoint);
+    }
+  });
+
   it("復号後の不正JSONを復号エラーとして扱う", () => {
     expect(() => parseArchive(new TextEncoder().encode("not json"))).toThrow(
       ArchiveDecryptionError,
@@ -38,12 +69,23 @@ describe("Archive validation", () => {
 
   it("復号後のJSONが最小Archive構造を満たさない場合は拒否する", () => {
     const incompleteArchive = new TextEncoder().encode(
-      JSON.stringify({ schemaVersion: "0.1.0" }),
+      JSON.stringify({ schemaVersion: "0.2.0" }),
     );
 
     expect(() => parseArchive(incompleteArchive)).toThrow(
       ArchiveDecryptionError,
     );
+  });
+
+  it("未登録playerIdを参照するArchiveを拒否する", () => {
+    expect(
+      isTournamentArchive({
+        ...plainArchive,
+        subgameResults: [
+          { roundNumber: 1, playerId: "UNKNOWN", point: 10 },
+        ],
+      }),
+    ).toBe(false);
   });
 });
 

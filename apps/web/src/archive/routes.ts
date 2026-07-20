@@ -2,6 +2,6 @@ export function buildArchivePath(archiveId: string): string {
   return `/archive/${encodeURIComponent(archiveId)}`;
 }
 
-export function buildPlayerPath(playerId: string): string {
-  return `/player/${encodeURIComponent(playerId)}`;
+export function buildStatisticsPath(archiveId: string): string {
+  return `${buildArchivePath(archiveId)}/statistics`;
 }

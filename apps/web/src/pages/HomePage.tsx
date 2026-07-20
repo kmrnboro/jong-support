@@ -42,7 +42,7 @@ export function HomePage({ entry }: HomePageProps) {
             </div>
             <div>
               <dt>対局</dt>
-              <dd>{entry.gameCount}卓</dd>
+              <dd>{entry.gameCount}半荘</dd>
             </div>
           </dl>
         </div>

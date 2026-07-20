@@ -25,12 +25,18 @@ export type MahjongGame = {
   results: GameResult[];
 };
 
+export type SubgameResult = {
+  roundNumber: number;
+  playerId: string;
+  point: number;
+};
+
 export type OfficialResult = {
   playerId: string;
   mahjongPoint: number;
+  mahjongRank: number;
   subgamePoint: number;
-  totalPoint: number;
-  rank: number;
+  subgameRank: number;
 };
 
 export type TournamentArchive = {
@@ -38,6 +44,7 @@ export type TournamentArchive = {
   tournament: Tournament;
   players: Player[];
   games: MahjongGame[];
+  subgameResults: SubgameResult[];
+  subgameDataStatus: "sample" | "official";
   officialResults: OfficialResult[];
 };
-

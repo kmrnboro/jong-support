@@ -9,7 +9,7 @@ import { ArchivePage } from "./pages/ArchivePage";
 import { ArchiveUnlockPage } from "./pages/ArchiveUnlockPage";
 import { HomePage } from "./pages/HomePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
-import { PlayerPage } from "./pages/PlayerPage";
+import { StatisticsPage } from "./pages/StatisticsPage";
 
 export function App() {
   const [archive, setArchive] = useState<TournamentArchive | null>(null);
@@ -34,10 +34,10 @@ export function App() {
           }
         />
         <Route
-          path="player/:playerId"
+          path="archive/:archiveId/statistics"
           element={
             unlockedArchive !== null ? (
-              <PlayerPage archive={unlockedArchive} />
+              <StatisticsPage archive={unlockedArchive} />
             ) : (
               <Navigate
                 replace

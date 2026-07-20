@@ -1,0 +1,230 @@
+import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
+
+import { buildArchivePath } from "../archive/routes";
+import { PointProgressChart } from "../components/PointProgressChart";
+import type { TournamentArchive } from "../domain/archive";
+import { createOfficialRanking } from "../domain/ranking";
+import {
+  calculateMahjongProgressions,
+  calculatePlayerStatistics,
+  calculateSubgameProgressions,
+} from "../domain/statistics";
+
+type StatisticsPageProps = {
+  archive: TournamentArchive;
+};
+
+const percentFormatter = new Intl.NumberFormat("ja-JP", {
+  style: "percent",
+  maximumFractionDigits: 1,
+});
+
+const seriesColors = [
+  "#176b5b",
+  "#b15f2a",
+  "#4467a8",
+  "#9a4770",
+  "#6d7d28",
+  "#754c9c",
+  "#a53e38",
+  "#247990",
+  "#8a681d",
+  "#4f5962",
+];
+
+export function StatisticsPage({ archive }: StatisticsPageProps) {
+  const { archiveId = "" } = useParams();
+  const [visiblePlayerIds, setVisiblePlayerIds] = useState(
+    () => new Set(archive.players.map((player) => player.playerId)),
+  );
+
+  if (archiveId !== archive.tournament.id) {
+    return (
+      <section className="message-card">
+        <p className="eyebrow">NOT FOUND</p>
+        <h1>大会が見つかりません</h1>
+        <Link className="text-link" to="/">
+          大会トップへ戻る
+        </Link>
+      </section>
+    );
+  }
+
+  const mahjongProgressions = calculateMahjongProgressions(
+    archive.players,
+    archive.games,
+  );
+  const subgameProgressions = calculateSubgameProgressions(
+    archive.players,
+    archive.subgameResults,
+  );
+  const colorByPlayerId = new Map(
+    archive.players.map((player, index) => [
+      player.playerId,
+      seriesColors[index % seriesColors.length],
+    ]),
+  );
+  const statistics = createOfficialRanking(archive, "mahjong").map(
+    (ranking) => ({
+      nickname: ranking.nickname,
+      ...calculatePlayerStatistics(ranking.playerId, archive.games),
+    }),
+  );
+
+  function togglePlayer(playerId: string) {
+    setVisiblePlayerIds((current) => {
+      const next = new Set(current);
+      if (next.has(playerId)) {
+        next.delete(playerId);
+      } else {
+        next.add(playerId);
+      }
+      return next;
+    });
+  }
+
+  return (
+    <div className="page-stack">
+      <header className="page-heading">
+        <div>
+          <p className="eyebrow">TOURNAMENT COMPARISON</p>
+          <h1>{archive.tournament.name} 統計</h1>
+          <p className="page-summary">全参加者の成績とpt推移を比較できます。</p>
+        </div>
+        <Link
+          className="text-link text-link-top"
+          to={buildArchivePath(archiveId)}
+        >
+          公式順位へ戻る
+        </Link>
+      </header>
+
+      <section className="player-filter" aria-labelledby="player-filter-title">
+        <div className="filter-heading">
+          <h2 id="player-filter-title">表示するプレイヤー</h2>
+          <div>
+            <button
+              type="button"
+              onClick={() =>
+                setVisiblePlayerIds(
+                  new Set(archive.players.map((player) => player.playerId)),
+                )
+              }
+            >
+              全員表示
+            </button>
+            <button type="button" onClick={() => setVisiblePlayerIds(new Set())}>
+              すべて解除
+            </button>
+          </div>
+        </div>
+        <div className="player-options">
+          {archive.players.map((player, index) => (
+            <label key={player.playerId}>
+              <input
+                type="checkbox"
+                checked={visiblePlayerIds.has(player.playerId)}
+                onChange={() => togglePlayer(player.playerId)}
+              />
+              <span
+                className="series-color"
+                style={{
+                  backgroundColor: seriesColors[index % seriesColors.length],
+                }}
+                aria-hidden="true"
+              />
+              {player.nickname}
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <section
+        className="content-card chart-card"
+        aria-labelledby="mahjong-chart-title"
+      >
+        <div className="section-heading compact-heading">
+          <div>
+            <p className="card-label">MAHJONG PROGRESSION</p>
+            <h2 id="mahjong-chart-title">麻雀pt推移</h2>
+          </div>
+        </div>
+        <PointProgressChart
+          label="麻雀pt"
+          series={mahjongProgressions}
+          visiblePlayerIds={visiblePlayerIds}
+          colorByPlayerId={colorByPlayerId}
+        />
+      </section>
+
+      <section
+        className="content-card chart-card"
+        aria-labelledby="subgame-chart-title"
+      >
+        <div className="section-heading compact-heading">
+          <div>
+            <p className="card-label">SUBGAME PROGRESSION</p>
+            <h2 id="subgame-chart-title">
+              サブゲームpt推移
+              {archive.subgameDataStatus === "sample" ? "（仮）" : ""}
+            </h2>
+          </div>
+        </div>
+        {archive.subgameDataStatus === "sample" ? (
+          <p className="sample-note">画面確認用の仮データを使用しています。</p>
+        ) : null}
+        <PointProgressChart
+          label="サブゲームpt"
+          series={subgameProgressions}
+          visiblePlayerIds={visiblePlayerIds}
+          colorByPlayerId={colorByPlayerId}
+        />
+      </section>
+
+      <section className="ranking-card" aria-labelledby="comparison-title">
+        <div className="section-heading">
+          <div>
+            <p className="card-label">MAHJONG STATISTICS</p>
+            <h2 id="comparison-title">麻雀成績比較</h2>
+          </div>
+        </div>
+        <div className="table-scroll" tabIndex={0}>
+          <table className="comparison-table">
+            <caption className="visually-hidden">
+              全参加者の対局数、平均順位、トップ率、ラス率
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">プレイヤー</th>
+                <th scope="col">対局数</th>
+                <th scope="col">平均順位</th>
+                <th scope="col">トップ率</th>
+                <th scope="col">ラス率</th>
+              </tr>
+            </thead>
+            <tbody>
+              {statistics.map((row) => (
+                <tr key={row.playerId}>
+                  <th scope="row">{row.nickname}</th>
+                  <td>{row.gameCount}</td>
+                  <td>{row.averageRank?.toFixed(2) ?? "—"}</td>
+                  <td>
+                    {row.topRate === null
+                      ? "—"
+                      : percentFormatter.format(row.topRate)}
+                  </td>
+                  <td>
+                    {row.lastRate === null
+                      ? "—"
+                      : percentFormatter.format(row.lastRate)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
+}

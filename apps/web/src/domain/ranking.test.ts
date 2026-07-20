@@ -4,7 +4,7 @@ import type { TournamentArchive } from "./archive";
 import { createOfficialRanking } from "./ranking";
 
 const archive: TournamentArchive = {
-  schemaVersion: "0.1.0",
+  schemaVersion: "0.2.0",
   tournament: {
     id: "ranking-test",
     name: "Ranking Test",
@@ -15,30 +15,40 @@ const archive: TournamentArchive = {
     { playerId: "P002", nickname: "Player B" },
   ],
   games: [],
+  subgameResults: [],
+  subgameDataStatus: "sample",
   officialResults: [
     {
       playerId: "P001",
       mahjongPoint: 100,
-      subgamePoint: 0,
-      totalPoint: 100,
-      rank: 2,
+      mahjongRank: 2,
+      subgamePoint: 20,
+      subgameRank: 1,
     },
     {
       playerId: "P002",
       mahjongPoint: -100,
-      subgamePoint: 0,
-      totalPoint: -100,
-      rank: 1,
+      mahjongRank: 1,
+      subgamePoint: 10,
+      subgameRank: 2,
     },
   ],
 };
 
 describe("createOfficialRanking", () => {
-  it("ポイントを再計算せずofficialResultsのrank順に並べる", () => {
-    const ranking = createOfficialRanking(archive);
+  it("ポイントを再計算せず部門ごとの公式順位に並べる", () => {
+    const mahjongRanking = createOfficialRanking(archive, "mahjong");
+    const subgameRanking = createOfficialRanking(archive, "subgame");
 
-    expect(ranking.map((row) => row.playerId)).toEqual(["P002", "P001"]);
-    expect(ranking.map((row) => row.nickname)).toEqual([
+    expect(mahjongRanking.map((row) => row.playerId)).toEqual([
+      "P002",
+      "P001",
+    ]);
+    expect(subgameRanking.map((row) => row.playerId)).toEqual([
+      "P001",
+      "P002",
+    ]);
+    expect(mahjongRanking.map((row) => row.nickname)).toEqual([
       "Player B",
       "Player A",
     ]);
@@ -51,16 +61,15 @@ describe("createOfficialRanking", () => {
         {
           playerId: "UNKNOWN",
           mahjongPoint: 0,
+          mahjongRank: 1,
           subgamePoint: 0,
-          totalPoint: 0,
-          rank: 1,
+          subgameRank: 1,
         },
       ],
     };
 
-    expect(() => createOfficialRanking(invalidArchive)).toThrow(
+    expect(() => createOfficialRanking(invalidArchive, "mahjong")).toThrow(
       "Unknown playerId in officialResults: UNKNOWN",
     );
   });
 });
-

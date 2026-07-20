@@ -19,6 +19,7 @@ describe("sample archive", () => {
       ...sampleArchive.games.flatMap((game) =>
         game.results.map((result) => result.playerId),
       ),
+      ...sampleArchive.subgameResults.map((result) => result.playerId),
       ...sampleArchive.officialResults.map((result) => result.playerId),
     ];
 
@@ -26,4 +27,5 @@ describe("sample archive", () => {
       referencedPlayerIds.every((playerId) => playerIds.has(playerId)),
     ).toBe(true);
   });
+
 });
