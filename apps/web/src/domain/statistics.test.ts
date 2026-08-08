@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 
+import archive2025 from "../../../../tests/fixtures/archive-no-subgame.json";
+import archive2026 from "../../../../tests/fixtures/archive.json";
+import { parseArchive } from "../archive/loadArchive";
 import type { MahjongGame, Player, SubgameResult } from "./archive";
 import {
+  calculateCrossYearStatistics,
   calculateMahjongProgressions,
   calculatePlayerStatistics,
   calculateSubgameProgressions,
+  summarizeArchive,
 } from "./statistics";
 
 const games: MahjongGame[] = [
@@ -119,5 +124,65 @@ describe("point progressions", () => {
         ],
       },
     ]);
+  });
+});
+
+describe("cross-year statistics", () => {
+  it("playerIdが同じ参加者を年度横断で集計する", () => {
+    const archives = [archive2025, archive2026].map((archive) =>
+      parseArchive(new TextEncoder().encode(JSON.stringify(archive))),
+    );
+    const statistics = calculateCrossYearStatistics(
+      archives.map(summarizeArchive),
+    );
+    const playerA = statistics.find(
+      (player) =>
+        player.playerId === "player_00000000000000000000000000000001",
+    );
+    const playerB = statistics.find(
+      (player) =>
+        player.playerId === "player_00000000000000000000000000000002",
+    );
+
+    expect(playerA).toMatchObject({
+      nickname: "Player A",
+      tournamentCount: 2,
+      gameCount: 4,
+      averageRank: 2.5,
+      topRate: 0.5,
+      lastRate: 0.5,
+      mahjongChampionships: 0,
+      subgameChampionships: 1,
+    });
+    expect(playerB).toMatchObject({
+      tournamentCount: 2,
+      gameCount: 4,
+      averageRank: 1.5,
+      mahjongChampionships: 1,
+      subgameChampionships: 1,
+    });
+  });
+
+  it("麻雀が参考記録でもサブゲーム公式参加者として保持する", () => {
+    const archive = parseArchive(
+      new TextEncoder().encode(JSON.stringify(archive2026)),
+    );
+    const statistics = calculateCrossYearStatistics([
+      summarizeArchive(archive),
+    ]);
+    const referencePlayer = statistics.find(
+      (player) =>
+        player.playerId === "player_00000000000000000000000000000008",
+    );
+
+    expect(referencePlayer).toMatchObject({
+      nickname: "Player H",
+      tournamentCount: 1,
+      gameCount: 2,
+      averageRank: 4,
+      topRate: 0,
+      lastRate: 1,
+      mahjongChampionships: 0,
+    });
   });
 });

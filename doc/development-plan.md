@@ -677,6 +677,8 @@ TypeScriptと将来のSQL/RPC実装で共有する正解データを作る。
 
 ### Task 4-5 Match History Page
 
+Status: Complete (2026-08-08)
+
 - ラウンド・卓ごとに4名、素点、順位、ptを表示
 
 ### Task 4-6 Statistics Visualization
@@ -973,6 +975,8 @@ constraintViolationPenalty
 - 上位3〜5候補を提示
 
 ## Task 9-5 Cross-Year Statistics
+
+Status: Complete (2026-08-08)
 
 ### Acceptance Criteria
 

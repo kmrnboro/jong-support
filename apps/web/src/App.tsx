@@ -14,9 +14,15 @@ import {
 import { buildArchivePath } from "./archive/routes";
 import { AppLayout } from "./components/AppLayout";
 import type { TournamentArchive } from "./domain/archive";
+import {
+  summarizeArchive,
+  type ArchiveStatisticsSummary,
+} from "./domain/statistics";
 import { ArchivePage } from "./pages/ArchivePage";
 import { ArchiveUnlockPage } from "./pages/ArchiveUnlockPage";
+import { CrossYearStatisticsPage } from "./pages/CrossYearStatisticsPage";
 import { HomePage } from "./pages/HomePage";
+import { MatchHistoryPage } from "./pages/MatchHistoryPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
 
@@ -24,40 +30,43 @@ type ArchiveRouteProps = {
   entries: ArchiveIndexEntry[];
   archive: TournamentArchive | null;
   onUnlocked: (archive: TournamentArchive) => void;
+  page?: "ranking" | "statistics" | "matches";
 };
 
-function ArchiveRoute({ entries, archive, onUnlocked }: ArchiveRouteProps) {
+function ArchiveRoute({
+  entries,
+  archive,
+  onUnlocked,
+  page = "ranking",
+}: ArchiveRouteProps) {
   const { archiveId = "" } = useParams();
   const entry = entries.find((item) => item.archiveId === archiveId);
   if (entry === undefined) {
     return <NotFoundPage />;
   }
-  return archive?.tournament.id === archiveId ? (
-    <ArchivePage archive={archive} />
-  ) : (
-    <ArchiveUnlockPage entry={entry} onUnlocked={onUnlocked} />
-  );
-}
-
-function StatisticsRoute({
-  entries,
-  archive,
-}: Omit<ArchiveRouteProps, "onUnlocked">) {
-  const { archiveId = "" } = useParams();
-  if (!entries.some((entry) => entry.archiveId === archiveId)) {
-    return <NotFoundPage />;
+  if (archive?.tournament.id !== archiveId) {
+    return page === "ranking" ? (
+      <ArchiveUnlockPage entry={entry} onUnlocked={onUnlocked} />
+    ) : (
+      <Navigate replace to={buildArchivePath(archiveId)} />
+    );
   }
-  return archive?.tournament.id === archiveId ? (
-    <StatisticsPage archive={archive} />
-  ) : (
-    <Navigate replace to={buildArchivePath(archiveId)} />
-  );
+  if (page === "statistics") {
+    return <StatisticsPage archive={archive} />;
+  }
+  if (page === "matches") {
+    return <MatchHistoryPage archive={archive} />;
+  }
+  return <ArchivePage archive={archive} />;
 }
 
 export function App() {
   const [index, setIndex] = useState<ArchiveIndex | null>(null);
   const [indexError, setIndexError] = useState<string | null>(null);
   const [archive, setArchive] = useState<TournamentArchive | null>(null);
+  const [archiveSummaries, setArchiveSummaries] = useState<
+    ArchiveStatisticsSummary[]
+  >([]);
 
   useEffect(() => {
     let active = true;
@@ -83,6 +92,16 @@ export function App() {
 
   const entries = index?.archives ?? [];
 
+  function handleUnlocked(loadedArchive: TournamentArchive) {
+    setArchive(loadedArchive);
+    setArchiveSummaries((current) => [
+      ...current.filter(
+        (summary) => summary.archiveId !== loadedArchive.tournament.id,
+      ),
+      summarizeArchive(loadedArchive),
+    ]);
+  }
+
   return (
     <AppLayout>
       {indexError !== null ? (
@@ -98,21 +117,53 @@ export function App() {
         </section>
       ) : (
         <Routes>
-          <Route index element={<HomePage entries={entries} />} />
+          <Route
+            index
+            element={
+              <HomePage
+                entries={entries}
+                summarizedArchiveIds={new Set(
+                  archiveSummaries.map((summary) => summary.archiveId),
+                )}
+              />
+            }
+          />
+          <Route
+            path="statistics"
+            element={
+              <CrossYearStatisticsPage summaries={archiveSummaries} />
+            }
+          />
           <Route
             path="archive/:archiveId"
             element={
               <ArchiveRoute
                 entries={entries}
                 archive={archive}
-                onUnlocked={setArchive}
+                onUnlocked={handleUnlocked}
               />
             }
           />
           <Route
             path="archive/:archiveId/statistics"
             element={
-              <StatisticsRoute entries={entries} archive={archive} />
+              <ArchiveRoute
+                entries={entries}
+                archive={archive}
+                onUnlocked={handleUnlocked}
+                page="statistics"
+              />
+            }
+          />
+          <Route
+            path="archive/:archiveId/matches"
+            element={
+              <ArchiveRoute
+                entries={entries}
+                archive={archive}
+                onUnlocked={handleUnlocked}
+                page="matches"
+              />
             }
           />
           <Route path="*" element={<NotFoundPage />} />

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { buildArchivePath, buildStatisticsPath } from "./routes";
+import {
+  buildArchivePath,
+  buildMatchHistoryPath,
+  buildStatisticsPath,
+} from "./routes";
 
 describe("buildArchivePath", () => {
   it("URLで安全に使えるアーカイブパスを返す", () => {
@@ -10,6 +14,12 @@ describe("buildArchivePath", () => {
   it("URLで安全に使える統計パスを返す", () => {
     expect(buildStatisticsPath("2026 summer")).toBe(
       "/archive/2026%20summer/statistics",
+    );
+  });
+
+  it("URLで安全に使える対局履歴パスを返す", () => {
+    expect(buildMatchHistoryPath("2026 summer")).toBe(
+      "/archive/2026%20summer/matches",
     );
   });
 });

@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 
-import { buildStatisticsPath } from "../archive/routes";
+import {
+  buildMatchHistoryPath,
+  buildStatisticsPath,
+} from "../archive/routes";
 import { createOfficialRanking } from "../domain/ranking";
 import type { TournamentArchive } from "../domain/archive";
 import { RankingTable } from "../components/RankingTable";
@@ -42,6 +45,12 @@ export function ArchivePage({ archive }: ArchivePageProps) {
             to={buildStatisticsPath(archive.tournament.id)}
           >
             比較統計を見る
+          </Link>
+          <Link
+            className="text-link"
+            to={buildMatchHistoryPath(archive.tournament.id)}
+          >
+            対局履歴を見る
           </Link>
           <Link className="text-link" to="/">
             大会トップへ

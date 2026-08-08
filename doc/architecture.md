@@ -458,7 +458,8 @@ apps/web/
 - 非同期データ: TanStack Queryを候補とする
 - 認証状態: ContextまたはSupabase標準機構
 - ドメイン計算結果: 純粋関数で導出
-- 復号済みアーカイブ: メモリ内状態
+- 復号済みアーカイブ: 現在表示中の1大会だけをメモリ内状態に保持
+- 年度横断統計: 復号時に生成した大会別集計値だけをメモリ内状態に保持
 
 グローバル状態を安易に増やさない。
 
@@ -470,8 +471,17 @@ apps/web/
 /
   大会一覧
 
+/statistics
+  開いた大会の年度横断統計
+
 /archive/:archiveId
   暗号化アーカイブ読込・結果表示
+
+/archive/:archiveId/statistics
+  大会内の参加者比較統計
+
+/archive/:archiveId/matches
+  ラウンド・卓ごとの対局履歴
 
 /live/:tournamentId
   大会中ダッシュボード

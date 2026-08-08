@@ -5,3 +5,7 @@ export function buildArchivePath(archiveId: string): string {
 export function buildStatisticsPath(archiveId: string): string {
   return `${buildArchivePath(archiveId)}/statistics`;
 }
+
+export function buildMatchHistoryPath(archiveId: string): string {
+  return `${buildArchivePath(archiveId)}/matches`;
+}

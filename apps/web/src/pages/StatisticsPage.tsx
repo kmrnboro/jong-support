@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { buildArchivePath } from "../archive/routes";
 import { PointProgressChart } from "../components/PointProgressChart";
 import type { TournamentArchive } from "../domain/archive";
-import { createOfficialRanking } from "../domain/ranking";
 import {
   calculateMahjongProgressions,
   calculatePlayerStatistics,
@@ -55,12 +54,12 @@ export function StatisticsPage({ archive }: StatisticsPageProps) {
       seriesColors[index % seriesColors.length],
     ]),
   );
-  const statistics = createOfficialRanking(archive, "mahjong").map(
-    (ranking) => ({
-      nickname: ranking.nickname,
-      ...calculatePlayerStatistics(ranking.playerId, archive.mahjong.games),
-    }),
-  );
+  const statistics = archive.players
+    .map((player) => ({
+      nickname: player.nickname,
+      ...calculatePlayerStatistics(player.playerId, archive.mahjong.games),
+    }))
+    .filter((player) => player.gameCount > 0);
 
   function togglePlayer(playerId: string) {
     setVisiblePlayerIds((current) => {

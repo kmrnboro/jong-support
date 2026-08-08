@@ -5,6 +5,7 @@ import { buildArchivePath } from "../archive/routes";
 
 type HomePageProps = {
   entries: ArchiveIndexEntry[];
+  summarizedArchiveIds: ReadonlySet<string>;
 };
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
@@ -13,7 +14,7 @@ const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   day: "numeric",
 });
 
-export function HomePage({ entries }: HomePageProps) {
+export function HomePage({ entries, summarizedArchiveIds }: HomePageProps) {
   return (
     <section className="hero" aria-labelledby="page-title">
       <p className="eyebrow">READ-ONLY ARCHIVE</p>
@@ -22,11 +23,17 @@ export function HomePage({ entries }: HomePageProps) {
         jong-supportは、麻雀大会の確定結果をGitHub Pagesで閲覧するための
         Archive Viewerです。
       </p>
+      <Link className="text-link cross-year-link" to="/statistics">
+        年度横断統計を見る（集計済み{summarizedArchiveIds.size}大会）
+      </Link>
 
       {entries.map((entry) => (
         <article className="tournament-card" key={entry.archiveId}>
           <div>
             <p className="card-label">AVAILABLE ARCHIVE</p>
+            {summarizedArchiveIds.has(entry.archiveId) ? (
+              <span className="summary-badge">年度横断統計に追加済み</span>
+            ) : null}
             <h2>{entry.title}</h2>
             <dl className="tournament-meta">
               <div>

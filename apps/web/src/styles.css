@@ -134,6 +134,11 @@ h1 {
   letter-spacing: -0.035em;
 }
 
+.hero h1 {
+  max-width: 18em;
+  font-size: clamp(2.2rem, 6vw, 3.8rem);
+}
+
 h2 {
   margin-bottom: 0;
   font-size: clamp(1.3rem, 3vw, 1.7rem);
@@ -493,28 +498,86 @@ h2 {
   text-align: center;
 }
 
-.comparison-table {
+.comparison-table,
+.cross-year-table,
+.match-table {
   width: 100%;
-  min-width: 35rem;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
 }
 
+.comparison-table {
+  min-width: 35rem;
+}
+
+.cross-year-link {
+  margin-top: -0.5rem;
+}
+
+.summary-badge {
+  display: inline-block;
+  margin: 0.5rem 0 0 0.75rem;
+  color: #265f50;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.cross-year-table {
+  min-width: 50rem;
+}
+
+.match-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.match-list > * {
+  min-width: 0;
+}
+
+.match-heading {
+  padding-bottom: 1rem;
+}
+
+.match-table {
+  min-width: 25rem;
+}
+
 .comparison-table th,
-.comparison-table td {
+.comparison-table td,
+.cross-year-table th,
+.cross-year-table td,
+.match-table th,
+.match-table td {
   padding: 0.8rem 1rem;
   border-top: 1px solid #e5e0d4;
   text-align: right;
 }
 
-.comparison-table th:first-child {
+.comparison-table th:first-child,
+.cross-year-table th:first-child,
+.match-table th:nth-child(2) {
   text-align: left;
 }
 
-.comparison-table thead th {
+.comparison-table thead th,
+.cross-year-table thead th,
+.match-table thead th {
   color: #727b77;
   background: #f7f3ea;
   font-size: 0.72rem;
+}
+
+.reference-badge {
+  display: inline-block;
+  margin-left: 0.45rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  color: #765126;
+  background: #f2e4c5;
+  font-size: 0.65rem;
+  font-weight: 700;
 }
 
 .unlock-layout {
@@ -647,6 +710,32 @@ h2 {
 
   .ranking-grid {
     grid-template-columns: 1fr;
+  }
+
+  .match-list {
+    grid-template-columns: 1fr;
+  }
+
+  .match-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .match-table th,
+  .match-table td {
+    padding: 0.7rem 0.5rem;
+  }
+
+  .match-table th:first-child {
+    width: 2.75rem;
+  }
+
+  .match-table th:nth-child(3) {
+    width: 5.5rem;
+  }
+
+  .match-table th:last-child {
+    width: 3.25rem;
   }
 
   .section-heading {
