@@ -2,7 +2,7 @@
 
 - Version: 0.1.0
 - Status: Draft
-- Last Updated: 2026-07-14
+- Last Updated: 2026-08-08
 - Related Documents:
   - `requirements.md`
   - `architecture.md`
@@ -30,6 +30,11 @@
 - 大会後の保管と次年度準備
 
 本書は、運営者が当日に迷わず操作できることを優先する。
+
+現行実装は大会後のArchive Viewerだけを対象とする。Supabase、大会中の入力、
+訂正、Realtimeに関する手順は将来の大会運営モード向けであり、現在は実行できない。
+現時点で利用できるのはplayerId台帳管理、Archive検証・暗号化・公開、
+ブラウザ内復号、順位・統計・対局履歴の閲覧である。
 
 ---
 
@@ -580,7 +585,6 @@ Primary OrganizerとSecondary Organizerがログインする。
 
 - サブゲーム名称
 - 加点単位
-- 総合順位へ反映するか
 - 入力担当者
 
 ### 12.2 Input
@@ -593,7 +597,7 @@ Primary OrganizerとSecondary Organizerがログインする。
 
 ### 12.3 Confirmation
 
-サブゲーム順位と総合順位への反映を確認する。
+サブゲーム順位を麻雀順位と分けて確認する。両部門を合算した総合順位は生成しない。
 
 毎年ルールが異なる場合は、最終得点だけを入力する初期運用とする。
 
@@ -701,10 +705,8 @@ data/plain/tournament-2026.json
 
 ### 15.2 Validate JSON
 
-```bash
-python tools/validate_archive.py \
-  data/plain/tournament-2026.json
-```
+公開CLIの実行時にSchema検証される。暗号化前に単独確認したい場合も、現行版では
+`publish_archive.py`の検証結果を使用する。
 
 確認:
 
@@ -718,12 +720,8 @@ python tools/validate_archive.py \
 
 ### 15.3 Compare Official Results
 
-可能であれば大会終了画面の順位とJSONの順位を比較する。
-
-```bash
-python tools/compare_official_results.py \
-  data/plain/tournament-2026.json
-```
+大会終了画面または運営から受領した公式結果と、JSONの`officialResults`を
+運営者2名で照合する。現行版に自動比較CLIはない。
 
 ### 15.4 Plaintext Backup
 
@@ -837,9 +835,10 @@ git push
 3. パスワード入力
 4. 復号成功
 5. 最終順位一致
-6. 個人成績表示
-7. スマートフォン確認
-8. 誤パスワード確認
+6. 比較統計と対局履歴表示
+7. 複数大会を開いた場合の年度横断統計
+8. スマートフォン確認
+9. 誤パスワード確認
 
 ### 17.6 Mark Tournament Archived
 
@@ -932,7 +931,7 @@ Primary OrganizerとSecondary Organizerが安全に保管する。
 記録先:
 
 ```text
-docs/incidents/2026-tournament.md
+doc/incidents/2026-tournament.md
 ```
 
 記録項目:
