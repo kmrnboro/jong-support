@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "players": [
+    { "playerId": "player_00000000000000000000000000000001", "currentNickname": "Player A", "previousNicknames": [] },
+    { "playerId": "player_00000000000000000000000000000002", "currentNickname": "Player B", "previousNicknames": [] },
+    { "playerId": "player_00000000000000000000000000000003", "currentNickname": "Player C", "previousNicknames": [] },
+    { "playerId": "player_00000000000000000000000000000004", "currentNickname": "Player D", "previousNicknames": [] },
+    { "playerId": "player_00000000000000000000000000000005", "currentNickname": "Player E", "previousNicknames": [] },
+    { "playerId": "player_00000000000000000000000000000006", "currentNickname": "Player F", "previousNicknames": [] },
+    { "playerId": "player_00000000000000000000000000000007", "currentNickname": "Player G", "previousNicknames": [] },
+    { "playerId": "player_00000000000000000000000000000008", "currentNickname": "Player H", "previousNicknames": [] },
+    { "playerId": "player_00000000000000000000000000000009", "currentNickname": "Player I", "previousNicknames": [] },
+    { "playerId": "player_0000000000000000000000000000000a", "currentNickname": "Player J", "previousNicknames": [] },
+    { "playerId": "player_0000000000000000000000000000000b", "currentNickname": "Player K", "previousNicknames": [] },
+    { "playerId": "player_0000000000000000000000000000000c", "currentNickname": "Player L", "previousNicknames": [] }
+  ]
+}

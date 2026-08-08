@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "1.0.0",
+  "exportedAt": "2025-07-05T12:00:00Z",
+  "tournament": {
+    "id": "2025-sample",
+    "name": "2025年度大会（匿名化サンプル）",
+    "date": "2025-07-05",
+    "revision": 1
+  },
+  "players": [
+    {
+      "playerId": "player_00000000000000000000000000000001",
+      "nickname": "Player A",
+      "rankingEligibility": { "mahjong": "official", "subgame": "notParticipating" }
+    },
+    {
+      "playerId": "player_00000000000000000000000000000002",
+      "nickname": "Player B",
+      "rankingEligibility": { "mahjong": "official", "subgame": "notParticipating" }
+    },
+    {
+      "playerId": "player_00000000000000000000000000000003",
+      "nickname": "Player C",
+      "rankingEligibility": { "mahjong": "official", "subgame": "notParticipating" }
+    },
+    {
+      "playerId": "player_00000000000000000000000000000004",
+      "nickname": "Player D",
+      "rankingEligibility": { "mahjong": "official", "subgame": "notParticipating" }
+    },
+    {
+      "playerId": "player_00000000000000000000000000000009",
+      "nickname": "Player I",
+      "rankingEligibility": { "mahjong": "official", "subgame": "notParticipating" }
+    },
+    {
+      "playerId": "player_0000000000000000000000000000000a",
+      "nickname": "Player J",
+      "rankingEligibility": { "mahjong": "official", "subgame": "notParticipating" }
+    },
+    {
+      "playerId": "player_0000000000000000000000000000000b",
+      "nickname": "Player K",
+      "rankingEligibility": { "mahjong": "official", "subgame": "notParticipating" }
+    },
+    {
+      "playerId": "player_0000000000000000000000000000000c",
+      "nickname": "Player L",
+      "rankingEligibility": { "mahjong": "official", "subgame": "notParticipating" }
+    }
+  ],
+  "mahjong": {
+    "scoring": {
+      "ruleId": "stored-final-points",
+      "ruleVersion": "1.0.0",
+      "parameters": {}
+    },
+    "games": [
+      {
+        "gameId": "R01-T01",
+        "roundNumber": 1,
+        "tableNumber": 1,
+        "results": [
+          { "playerId": "player_00000000000000000000000000000001", "rawScore": 42000, "rank": 1, "finalPoint": 32 },
+          { "playerId": "player_00000000000000000000000000000002", "rawScore": 28000, "rank": 2, "finalPoint": 8 },
+          { "playerId": "player_00000000000000000000000000000003", "rawScore": 20000, "rank": 3, "finalPoint": -10 },
+          { "playerId": "player_00000000000000000000000000000004", "rawScore": 10000, "rank": 4, "finalPoint": -30 }
+        ]
+      },
+      {
+        "gameId": "R01-T02",
+        "roundNumber": 1,
+        "tableNumber": 2,
+        "results": [
+          { "playerId": "player_00000000000000000000000000000009", "rawScore": 39000, "rank": 1, "finalPoint": 29 },
+          { "playerId": "player_0000000000000000000000000000000a", "rawScore": 31000, "rank": 2, "finalPoint": 11 },
+          { "playerId": "player_0000000000000000000000000000000b", "rawScore": 18000, "rank": 3, "finalPoint": -12 },
+          { "playerId": "player_0000000000000000000000000000000c", "rawScore": 12000, "rank": 4, "finalPoint": -28 }
+        ]
+      },
+      {
+        "gameId": "R02-T01",
+        "roundNumber": 2,
+        "tableNumber": 1,
+        "results": [
+          { "playerId": "player_00000000000000000000000000000002", "rawScore": 40000, "rank": 1, "finalPoint": 30 },
+          { "playerId": "player_00000000000000000000000000000003", "rawScore": 30000, "rank": 2, "finalPoint": 10 },
+          { "playerId": "player_00000000000000000000000000000004", "rawScore": 20000, "rank": 3, "finalPoint": -10 },
+          { "playerId": "player_00000000000000000000000000000001", "rawScore": 10000, "rank": 4, "finalPoint": -30 }
+        ]
+      },
+      {
+        "gameId": "R02-T02",
+        "roundNumber": 2,
+        "tableNumber": 2,
+        "results": [
+          { "playerId": "player_0000000000000000000000000000000a", "rawScore": 44000, "rank": 1, "finalPoint": 34 },
+          { "playerId": "player_0000000000000000000000000000000b", "rawScore": 26000, "rank": 2, "finalPoint": 6 },
+          { "playerId": "player_0000000000000000000000000000000c", "rawScore": 18000, "rank": 3, "finalPoint": -12 },
+          { "playerId": "player_00000000000000000000000000000009", "rawScore": 12000, "rank": 4, "finalPoint": -28 }
+        ]
+      }
+    ],
+    "officialResults": [
+      { "playerId": "player_0000000000000000000000000000000a", "point": 45, "rank": 1 },
+      { "playerId": "player_00000000000000000000000000000002", "point": 38, "rank": 2 },
+      { "playerId": "player_00000000000000000000000000000001", "point": 2, "rank": 3 },
+      { "playerId": "player_00000000000000000000000000000009", "point": 1, "rank": 4 },
+      { "playerId": "player_00000000000000000000000000000003", "point": 0, "rank": 5 },
+      { "playerId": "player_0000000000000000000000000000000b", "point": -6, "rank": 6 },
+      { "playerId": "player_0000000000000000000000000000000c", "point": -40, "rank": 7 },
+      { "playerId": "player_00000000000000000000000000000004", "point": -40, "rank": 7 }
+    ]
+  },
+  "subgame": null,
+  "exportMetadata": {
+    "generator": "jong-support-test-fixture",
+    "source": "sample"
+  }
+}

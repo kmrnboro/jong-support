@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { buildStatisticsPath } from "../archive/routes";
 import { createOfficialRanking } from "../domain/ranking";
@@ -16,22 +16,11 @@ const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
 });
 
 export function ArchivePage({ archive }: ArchivePageProps) {
-  const { archiveId = "" } = useParams();
-
-  if (archiveId !== archive.tournament.id) {
-    return (
-      <section className="message-card">
-        <p className="eyebrow">NOT FOUND</p>
-        <h1>大会が見つかりません</h1>
-        <Link className="text-link" to="/">
-          大会トップへ戻る
-        </Link>
-      </section>
-    );
-  }
-
   const mahjongRanking = createOfficialRanking(archive, "mahjong");
-  const subgameRanking = createOfficialRanking(archive, "subgame");
+  const subgameRanking =
+    archive.subgame === null
+      ? null
+      : createOfficialRanking(archive, "subgame");
 
   return (
     <div className="page-stack">
@@ -71,21 +60,39 @@ export function ArchivePage({ archive }: ArchivePageProps) {
           <RankingTable rows={mahjongRanking} label="麻雀" />
         </section>
 
-        <section className="ranking-card" aria-labelledby="subgame-ranking-title">
-          <div className="section-heading">
-            <div>
-              <p className="card-label">SUBGAME</p>
-              <h2 id="subgame-ranking-title">
-                サブゲーム順位
-                {archive.subgameDataStatus === "sample" ? "（仮）" : ""}
-              </h2>
+        {subgameRanking === null ? (
+          <section
+            className="ranking-card"
+            aria-labelledby="subgame-ranking-title"
+          >
+            <div className="section-heading">
+              <div>
+                <p className="card-label">SUBGAME</p>
+                <h2 id="subgame-ranking-title">サブゲーム</h2>
+              </div>
             </div>
-          </div>
-          <RankingTable rows={subgameRanking} label="サブゲーム" />
-        </section>
+            <p>この大会にはサブゲーム記録がありません。</p>
+          </section>
+        ) : (
+          <section
+            className="ranking-card"
+            aria-labelledby="subgame-ranking-title"
+          >
+            <div className="section-heading">
+              <div>
+                <p className="card-label">SUBGAME</p>
+                <h2 id="subgame-ranking-title">
+                  サブゲーム順位
+                  {archive.subgame?.dataStatus === "sample" ? "（仮）" : ""}
+                </h2>
+              </div>
+            </div>
+            <RankingTable rows={subgameRanking} label="サブゲーム" />
+          </section>
+        )}
       </div>
 
-      {archive.subgameDataStatus === "sample" ? (
+      {archive.subgame?.dataStatus === "sample" ? (
         <p className="sample-note">
           サブゲームは画面確認用の仮データです。実データ受領後に差し替えます。
         </p>

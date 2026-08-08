@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import encryptedArchiveText from "../../public/archives/2026-sample.enc?raw";
+import encryptedArchiveText from "../../public/archives/2026-sample-v1.enc?raw";
 import plainArchive from "../../../../tests/fixtures/archive.json";
 import {
   calculateMahjongProgressions,
@@ -40,24 +40,27 @@ describe("Archive validation", () => {
     );
     const mahjongProgressions = calculateMahjongProgressions(
       archive.players,
-      archive.games,
+      archive.mahjong.games,
     );
+    expect(archive.subgame).not.toBeNull();
     const subgameProgressions = calculateSubgameProgressions(
       archive.players,
-      archive.subgameResults,
+      archive.subgame?.results ?? [],
     );
 
-    for (const result of archive.officialResults) {
+    for (const result of archive.mahjong.officialResults) {
       expect(
         mahjongProgressions
           .find((item) => item.playerId === result.playerId)
           ?.points.at(-1)?.point,
-      ).toBe(result.mahjongPoint);
+      ).toBe(result.point);
+    }
+    for (const result of archive.subgame?.officialResults ?? []) {
       expect(
         subgameProgressions
           .find((item) => item.playerId === result.playerId)
           ?.points.at(-1)?.point,
-      ).toBe(result.subgamePoint);
+      ).toBe(result.point);
     }
   });
 
@@ -69,7 +72,7 @@ describe("Archive validation", () => {
 
   it("復号後のJSONが最小Archive構造を満たさない場合は拒否する", () => {
     const incompleteArchive = new TextEncoder().encode(
-      JSON.stringify({ schemaVersion: "0.2.0" }),
+      JSON.stringify({ schemaVersion: "1.0.0" }),
     );
 
     expect(() => parseArchive(incompleteArchive)).toThrow(
@@ -81,9 +84,10 @@ describe("Archive validation", () => {
     expect(
       isTournamentArchive({
         ...plainArchive,
-        subgameResults: [
-          { roundNumber: 1, playerId: "UNKNOWN", point: 10 },
-        ],
+        subgame: {
+          ...plainArchive.subgame,
+          results: [{ roundNumber: 1, playerId: "UNKNOWN", point: 10 }],
+        },
       }),
     ).toBe(false);
   });
@@ -99,9 +103,9 @@ describe("loadEncryptedArchive", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(
-      loadEncryptedArchive("/archives/2026-sample.enc", FIXTURE_PASSWORD),
+      loadEncryptedArchive("/archives/2026-sample-v1.enc", FIXTURE_PASSWORD),
     ).resolves.toEqual(plainArchive);
-    expect(fetchMock).toHaveBeenCalledWith("/archives/2026-sample.enc");
+    expect(fetchMock).toHaveBeenCalledWith("/archives/2026-sample-v1.enc");
   });
 
   it("HTTPエラーを取得エラーとして扱う", async () => {

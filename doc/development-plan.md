@@ -2,7 +2,7 @@
 
 - Version: 0.1.0
 - Status: Draft
-- Last Updated: 2026-07-14
+- Last Updated: 2026-07-20
 - Related Documents:
   - `requirements.md`
   - `architecture.md`
@@ -343,18 +343,22 @@ Python:
 
 ### Outputs
 
-Git管理外または匿名化した対応表。
+Git管理外の年度横断プレイヤー台帳と、そのバックアップ手順。
 
 ### Constraints
 
 - 本名を使用しない
 - ニックネームを主キーにしない
 - 不確実な同一人物判定を自動化しない
+- playerIdへ年度を含めない
+- Archiveには大会開催時点のニックネームを保存する
 
 ### Acceptance Criteria
 
 - 通算集計用playerId方針が確定する
 - 表記揺れが列挙される
+- 2年度のサンプルで同一人物が同じplayerIdを持つ
+- 未登録IDとID再利用を管理CLIが拒否できる
 
 ## Task 1-4 Representative Dataset Selection
 
@@ -406,12 +410,16 @@ Git管理外または匿名化した対応表。
 - SubgameDefinition
 - SubgameResult
 - OfficialResult
+- RankingEligibility
+- ScoringRuleReference
 - ArchiveMetadata
 
 ### Acceptance Criteria
 
 - ID方針が統一される
 - ニックネームとplayerIdが分離される
+- 参加資格を麻雀・サブゲーム別に表現できる
+- サブゲームが存在しない年度を`null`で表現できる
 - DB固有情報をCanonicalモデルに含めない
 
 ## Task 2-2 JSON Schema
@@ -422,13 +430,18 @@ Git管理外または匿名化した対応表。
 
 ### Outputs
 
-`schemas/tournament-archive.schema.json`
+- `schemas/tournament-archive.schema.json`
+- `schemas/archive-index.schema.json`
 
 ### Acceptance Criteria
 
 - 必須項目と任意項目が明確
-- `schemaVersion` を持つ
+- `schemaVersion: 1.0.0`を持つ
 - 欠損状態を表現できる
+- `additionalProperties: false`を基本とする
+- `official`、`reference`、`notParticipating`を部門別に表現できる
+- 得点方式を`ruleId`、`ruleVersion`、パラメータで表現できる
+- 実行可能コードを格納できない
 - サンプルJSONがvalidateされる
 - 不正JSONがrejectされる
 
@@ -510,6 +523,7 @@ UI・DBから独立した得点・順位・統計ロジックを実装する。
 ### Inputs
 
 - RuleSet
+- ruleId / ruleVersion / parameters
 - 4名の素点
 - 必要に応じて席順または順位指定
 
@@ -525,6 +539,9 @@ UI・DBから独立した得点・順位・統計ロジックを実装する。
 
 - 純粋関数
 - ReactやSupabaseへ依存しない
+- ルールレジストリから既知の純粋関数を選択する
+- JSON内のコードを評価しない
+- 汎用数式DSLを初期実装へ含めない
 - 浮動小数誤差を考慮
 - 丸め規則を明示
 
@@ -540,6 +557,8 @@ UI・DBから独立した得点・順位・統計ロジックを実装する。
 ### Acceptance Criteria
 
 - 代表Excelの公式結果を再現する
+- 順位と素点帯の組み合わせで変動するルールを表現できる
+- 未知のruleIdと未対応versionを拒否する
 - 全テストが通る
 
 ## Task 3-2 Ranking Calculation
@@ -640,6 +659,9 @@ TypeScriptと将来のSQL/RPC実装で共有する正解データを作る。
 - 開催日
 - 参加者数
 - アーカイブ状態
+- `public/archives/index.json`を実行時に取得
+- TypeScriptへ大会情報をハードコードしない
+- indexへの追加だけで大会カードが増える
 
 ### Task 4-3 Ranking Page
 
@@ -719,7 +741,14 @@ TypeScriptと将来のSQL/RPC実装で共有する正解データを作る。
 
 ## Task 5-3 Archive Index
 
-`public/archives/index.json` を作成する。
+`public/archives/index.json` を作成し、管理CLIから更新する。
+
+### Acceptance Criteria
+
+- Archive本体のメタデータからindex entryを生成する
+- archiveId重複と参照先ファイル欠損を拒否する
+- Webがindexを実行時に読み込む
+- index追加時にWebコード変更を必要としない
 
 ## Task 5-4 GitHub Pages Deployment
 
@@ -951,6 +980,8 @@ constraintViolationPenalty
 - 年度別と通算を切替
 - 参加年度数を表示
 - 欠損年度を適切に扱う
+- 年度ごとのニックネーム変更を同一人物として扱う
+- `reference`記録を公式通算順位と分けて表示する
 
 ---
 
@@ -1273,26 +1304,129 @@ Codexへ最終判断させない項目:
 
 # 23. Immediate Next Actions
 
-1. リポジトリを作成する
-2. 過去Excelをローカルの `data/raw/` に配置する
-3. Gitへ入らないことを確認する
-4. Task 1-1としてExcel一覧と構造を調査する
-5. 代表年度を1つ選ぶ
-6. `docs/scoring-rules.md` を作成する
-7. Task 2-1のデータモデル定義へ進む
+2026年度の公式Excel受領を待つ間に、実データへ依存しないArchive追加基盤を完成させる。
 
-最初のCodex依頼例:
+## W-07A Cross-Year Player Registry
 
-```text
-requirements.md、architecture.md、development-plan.mdを参照し、
-Task 0-1 Repository Initializationだけを実施してください。
+Status: Complete (2026-07-20)
 
-コード機能は実装せず、ディレクトリ構成、README、.gitignore、
-基本設定ファイルのひな形のみを作成してください。
+### Outputs
 
-data/raw、data/plain、*.xlsx、平文大会JSONがGit管理対象に
-ならないことを確認する手順も追加してください。
+- Git管理外の`data/private/player-registry.json`
+- 台帳のSchemaまたはvalidator
+- 新規playerId発行・既存playerId選択手順
+
+### Acceptance Criteria
+
+- playerIdは年度を含まない安定識別子である
+- ニックネーム変更後も同一playerIdを利用できる
+- ニックネームだけで人物を自動統合しない
+- 未登録IDと別人へのID再利用を拒否する
+
+## W-07B Tournament Archive Schema 1.0
+
+Status: Complete (2026-07-28)
+
+### Outputs
+
+- `schemas/tournament-archive.schema.json`
+- `schemas/archive-index.schema.json`
+
+### Required Decisions
+
+- 麻雀とサブゲームを独立部門にする
+- サブゲームなしは`null`で表す
+- 参加資格は`official`、`reference`、`notParticipating`とする
+- 得点方式は`ruleId`、`ruleVersion`、パラメータで参照する
+- Archiveへ実行可能コードを含めない
+
+### Acceptance Criteria
+
+- SchemaをArchive形式のSingle Source of Truthとする
+- 途中参加者の対局を保持したまま公式順位から除外できる
+- 公式順位が`official`以外を参照した場合にrejectする
+- サブゲームあり・なしの両fixtureがvalidateされる
+
+## W-07C Schema Validation and Sample Migration
+
+Status: Complete (2026-07-28)
+
+- TypeScriptとPythonで同じJSON Schemaを検証する
+- 現在のArchive 0.2 fixtureを1.0へ移行する
+- 暗号fixtureを再生成する
+- Schema、型、実行時validatorの不一致をテストで検出する
+
+## W-07D Scoring Rule Registry Contract
+
+Status: Complete (2026-07-28)
+
+このTaskではインターフェースと検証境界だけを定義し、大会運営用の得点計算は実装しない。
+
+### Acceptance Criteria
+
+- ruleIdとversionから純粋関数を選択できる契約がある
+- ルール固有パラメータを検証できる
+- 未知のruleIdと未対応versionを拒否できる
+- 任意コード評価や汎用数式DSLを含まない
+
+## W-07E Archive Publish CLI
+
+Status: Complete (2026-07-28)
+
+想定コマンド:
+
+```bash
+python tools/publish_archive.py data/plain/<archiveId>.json
 ```
+
+### Responsibilities
+
+- Archive Schema検証
+- playerId台帳との照合
+- 参加資格と公式順位の整合性検証
+- パスワード対話入力
+- 暗号化と復号一致確認
+- `public/archives/<archiveId>.enc`生成
+- `public/archives/index.json`更新
+- 重複・意図しない上書きの拒否
+
+平文JSON、パスワード、年度横断プレイヤー台帳はGitへ追加しない。
+
+## W-08 Dynamic Archive Index
+
+Status: Complete (2026-07-28)
+
+- 起動時に`public/archives/index.json`を取得する
+- 全大会を一覧表示する
+- archiveIdから対象entryと暗号Archiveを解決する
+- 復号済みArchiveは現在表示中の1大会だけメモリ保持する
+- ハードコードされた`sampleArchiveEntry`を削除する
+
+### Acceptance Criteria
+
+- index entryと`.enc`追加後にWebコードを変更せず大会が表示される
+- 不正index、未知archiveId、取得失敗を利用者向けに表示する
+- 状態管理ライブラリを追加しない
+
+## W-09 Multi-Year Addition Proof
+
+Status: Complete (2026-07-28)
+
+- 2年度分の匿名化fixtureを管理CLIで公開する
+- 異なる大会をそれぞれ復号・閲覧できることを確認する
+- 片方はサブゲームなし、片方は参考記録ありとする
+- GitHub Pages production成果物に平文がないことを確認する
+
+年度横断の集計画面はPhase 9のTask 9-5で実装する。W-09ではplayerIdが
+複数Archive間で一貫することだけを検証する。
+
+## Deferred Until Official Data Arrives
+
+- 2026年度公式Excelの取り込み
+- 実データの公式順位照合
+- 2026年度Archiveの公開
+
+Supabase、Tournament Mode、実際の得点計算関数はこの作業列に含めない。
 
 ---
 

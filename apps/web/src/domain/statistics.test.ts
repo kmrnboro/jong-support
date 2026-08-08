@@ -33,8 +33,16 @@ const games: MahjongGame[] = [
 ];
 
 const players: Player[] = [
-  { playerId: "P001", nickname: "Player A" },
-  { playerId: "P002", nickname: "Player B" },
+  {
+    playerId: "P001",
+    nickname: "Player A",
+    rankingEligibility: { mahjong: "official", subgame: "official" },
+  },
+  {
+    playerId: "P002",
+    nickname: "Player B",
+    rankingEligibility: { mahjong: "official", subgame: "official" },
+  },
 ];
 
 const subgameResults: SubgameResult[] = [

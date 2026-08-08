@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import type { ArchiveIndexEntry } from "../archive/archiveIndex";
 import {
@@ -27,22 +27,9 @@ export function ArchiveUnlockPage({
   entry,
   onUnlocked,
 }: ArchiveUnlockPageProps) {
-  const { archiveId = "" } = useParams();
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isUnlocking, setIsUnlocking] = useState(false);
-
-  if (archiveId !== entry.archiveId) {
-    return (
-      <section className="message-card">
-        <p className="eyebrow">NOT FOUND</p>
-        <h1>大会が見つかりません</h1>
-        <Link className="text-link" to="/">
-          大会トップへ戻る
-        </Link>
-      </section>
-    );
-  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

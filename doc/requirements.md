@@ -1,7 +1,8 @@
 # Mahjong Tournament Support System Requirements
 
-Version: 0.1.0\
-Status: Draft
+- Version: 0.1.0
+- Status: Draft
+- Last Updated: 2026-07-20
 
 ## 1. Project Overview
 
@@ -56,6 +57,19 @@ Status: Draft
 - グラフは参加者ごとに表示を切り替えられる
 - 麻雀統計は個人ページではなく、全参加者の比較ページを基本とする
 - 実データ受領前のサブゲーム結果は、仮データと明示した場合に限り利用できる
+
+### Archive 1.0 and Multi-Year Requirements
+
+- `playerId`は大会・年度をまたいで同一人物に同じ値を使用する
+- ニックネームは大会開催時点の表示名として各Archiveへ保存する
+- 麻雀・サブゲームの参加資格を部門別に保持する
+- 途中参加者は対局・統計・推移へ残し、参考記録として公式順位から除外できる
+- サブゲームが存在しない年度を欠損として表現できる
+- 得点方式は`ruleId`、`ruleVersion`、パラメータで指定する
+- Archiveへ実行可能なJavaScript・Pythonコードを埋め込まない
+- 既知の得点方式はUI・外部サービスに依存しない純粋関数として登録する
+- 共通JSON Schemaに適合する年度は、Webコードを変更せず追加できる
+- 平文JSONはGitへ追加せず、管理CLIが暗号Archiveと公開indexを生成する
 
 ### In Scope
 
@@ -131,11 +145,16 @@ FR-010 過去大会閲覧
 -   GitHubには暗号化ファイルのみ配置する
 -   復号はブラウザ内で実施する
 -   平文JSONはGitへコミットしない
+-   正式なJSON SchemaをArchive形式の正本とする
+-   公開対象の追加は管理CLIを経由し、暗号Archiveとindexの整合性を検証する
 
 ## 8. Design Principles
 
 -   Player IDと表示名を分離
+-   Player IDを年度横断の安定した識別子とする
+-   公式順位対象と参考記録を分離
 -   得点計算ロジックをUIから分離
+-   得点ルールを識別子・バージョン・パラメータで選択
 -   オンライン・アーカイブで同じ集計ロジックを利用
 -   JSON SchemaをSingle Source of Truthとする
 

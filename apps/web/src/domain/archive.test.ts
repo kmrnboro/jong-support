@@ -16,16 +16,22 @@ describe("sample archive", () => {
       sampleArchive.players.map((player) => player.playerId),
     );
     const referencedPlayerIds = [
-      ...sampleArchive.games.flatMap((game) =>
+      ...sampleArchive.mahjong.games.flatMap((game) =>
         game.results.map((result) => result.playerId),
       ),
-      ...sampleArchive.subgameResults.map((result) => result.playerId),
-      ...sampleArchive.officialResults.map((result) => result.playerId),
+      ...(sampleArchive.subgame?.results ?? []).map(
+        (result) => result.playerId,
+      ),
+      ...sampleArchive.mahjong.officialResults.map(
+        (result) => result.playerId,
+      ),
+      ...(sampleArchive.subgame?.officialResults ?? []).map(
+        (result) => result.playerId,
+      ),
     ];
 
     expect(
       referencedPlayerIds.every((playerId) => playerIds.has(playerId)),
     ).toBe(true);
   });
-
 });

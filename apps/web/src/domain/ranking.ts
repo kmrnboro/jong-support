@@ -17,15 +17,12 @@ export function createOfficialRanking(
     archive.players.map((player) => [player.playerId, player.nickname]),
   );
 
-  const pointKey = category === "mahjong" ? "mahjongPoint" : "subgamePoint";
-  const rankKey = category === "mahjong" ? "mahjongRank" : "subgameRank";
+  const results =
+    category === "mahjong"
+      ? archive.mahjong.officialResults
+      : (archive.subgame?.officialResults ?? []);
 
-  return archive.officialResults
-    .map((result) => ({
-      playerId: result.playerId,
-      point: result[pointKey],
-      rank: result[rankKey],
-    }))
+  return [...results]
     .sort((left, right) => left.rank - right.rank)
     .map((result) => {
       const nickname = nicknameByPlayerId.get(result.playerId);

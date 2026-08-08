@@ -2,7 +2,7 @@
 
 - Version: 0.1.0
 - Status: Draft
-- Last Updated: 2026-07-14
+- Last Updated: 2026-07-20
 - Related Document: `requirements.md`
 
 ---
@@ -158,8 +158,8 @@
 累積推移を生成する。統計画面では全参加者を同じグラフと比較表に表示し、
 Reactのローカル状態だけで参加者ごとの線をon/offする。
 
-サブゲーム仮データは`subgameDataStatus: "sample"`で識別し、画面上にも明示する。
-実データへの差し替え時は`subgameResults`と部門別公式結果を更新してArchiveを
+サブゲーム仮データは`subgame.dataStatus: "sample"`で識別し、画面上にも明示する。
+実データへの差し替え時は`subgame.results`と部門別公式結果を更新してArchiveを
 再暗号化する。パスワードや復号済みArchiveは永続化しない。
 
 #### Source of Truth
@@ -368,6 +368,7 @@ tools/
   import_excel.py
   validate_archive.py
   compare_official_results.py
+  publish_archive.py
   encrypt_archive.py
   decrypt_archive.py
   importers/
@@ -676,20 +677,65 @@ Realtime購読対象は必要最小限とする。
 ```json
 {
   "schemaVersion": "1.0.0",
-  "calculationVersion": "1.0.0",
   "exportedAt": "2026-07-14T00:00:00Z",
   "tournament": {},
-  "rules": {},
-  "players": [],
-  "mahjongGames": [],
-  "subgameDefinitions": [],
-  "subgameResults": [],
-  "officialResults": [],
+  "players": [
+    {
+      "playerId": "player_0123456789abcdef0123456789abcdef",
+      "nickname": "大会開催時の表示名",
+      "rankingEligibility": {
+        "mahjong": "official",
+        "subgame": "reference"
+      }
+    }
+  ],
+  "mahjong": {
+    "scoring": {
+      "ruleId": "stored-final-points",
+      "ruleVersion": "1.0.0",
+      "parameters": {}
+    },
+    "games": [],
+    "officialResults": []
+  },
+  "subgame": null,
   "exportMetadata": {}
 }
 ```
 
-### 11.2 Why Not Database Dump
+正式な構造は`schemas/tournament-archive.schema.json`を正本とし、
+`additionalProperties: false`を基本として意図しない項目を拒否する。
+
+### 11.2 Cross-Year Player Identity
+
+`playerId`は年度内の連番ではなく、全年度を通じた安定識別子とする。
+ニックネームは変更可能な表示情報であるため、各Archiveへ大会開催時点の値を保存する。
+
+管理CLIはGit管理外のプレイヤー台帳を参照し、未登録ID、別人へのID再利用、
+ニックネームを主キーとした自動統合を拒否する。年度横断統計は`playerId`で結合する。
+
+### 11.3 Ranking Eligibility
+
+参加資格は麻雀・サブゲームごとに次の値を持つ。
+
+- `official`: 公式順位対象
+- `reference`: 記録と統計には含めるが公式順位対象外
+- `notParticipating`: その部門に不参加
+
+途中参加者の対局結果は削除せず、推移・統計へ含める。`officialResults`は
+`official`の参加者だけを参照し、validatorが不一致を拒否する。
+
+### 11.4 Scoring Rule Reference
+
+Archiveは実行可能コードではなく、`ruleId`、`ruleVersion`、検証可能な
+パラメータだけを保存する。得点計算関数はアプリケーション側のルールレジストリへ
+純粋関数として登録する。
+
+既存の`ruleId`で表現できる大会はJSONのパラメータ変更だけで扱える。
+新しい計算方式はコード、テストベクトル、version追加を必要とする。
+Archive Viewerは保存済み`finalPoint`と公式順位を表示し、閲覧時に再計算しない。
+
+### 11.5 Why Not Database Dump
 
 DBダンプを公式アーカイブにしない理由:
 
@@ -701,7 +747,7 @@ DBダンプを公式アーカイブにしない理由:
 
 DBダンプは障害復旧用の補助バックアップとして別途保管してよい。
 
-### 11.3 Archive Index
+### 11.6 Archive Index
 
 GitHub Pages上の大会一覧用に非機密なインデックスを持つ。
 
@@ -721,6 +767,25 @@ GitHub Pages上の大会一覧用に非機密なインデックスを持つ。
 ```
 
 大会名・開催日も秘匿したい場合は将来インデックスも暗号化できる。
+
+Webアプリは起動時にindexを取得し、`archiveId`から対象ファイルを解決する。
+大会情報をTypeScriptへハードコードしない。
+
+### 11.7 Archive Publication Flow
+
+```text
+data/plain/<archiveId>.json（Git管理外）
+    ↓ publish CLI
+JSON Schema・参照整合性・公式順位対象を検証
+    ↓
+public/archives/<archiveId>.enc
+public/archives/index.json
+    ↓ commit / push
+Webコード変更なしで大会一覧へ追加
+```
+
+平文JSONをGitHub Actions内で暗号化する方式は採用しない。パスワードと平文を
+GitHubへ渡さず、暗号化と復号照合は運営者のローカル環境で完了させる。
 
 ---
 
@@ -835,7 +900,14 @@ Render
 - 同卓履歴
 - 次卓候補評価
 
-### 13.2 Server-Side Revalidation
+### 13.2 Scoring Rule Registry
+
+得点方式は`ruleId`と`ruleVersion`で純粋関数を選択する。JSONのパラメータは
+対応するルール固有Schemaで検証し、未知のruleId、未対応version、余分な項目を拒否する。
+
+任意コードをJSONから動的に評価するプラグイン方式や、汎用数式DSLは初期版では採用しない。
+
+### 13.3 Server-Side Revalidation
 
 共通TypeScriptロジックだけではDB改ざんや直接API呼び出しを防げない。
 
@@ -848,7 +920,7 @@ TypeScriptとSQLにロジック重複が発生するが、役割は異なる。
 
 計算仕様はテストベクトルを共通SSOTとして両実装へ適用する。
 
-### 13.3 Test Vector Example
+### 13.4 Test Vector Example
 
 ```json
 {
@@ -1060,11 +1132,12 @@ mahjong-tournament/
 │   ├── import_excel.py
 │   ├── validate_archive.py
 │   ├── compare_official_results.py
+│   ├── publish_archive.py
 │   ├── encrypt_archive.py
 │   └── decrypt_archive.py
 ├── schemas/
 │   ├── tournament-archive.schema.json
-│   └── encrypted-archive.schema.json
+│   └── archive-index.schema.json
 ├── supabase/
 │   ├── migrations/
 │   ├── seed.sql
@@ -1276,10 +1349,9 @@ Realtimeイベントだけで状態を組み立てると訂正時に不整合が
 9. GitHub Pages routing方式
 10. 次卓候補アルゴリズム
 11. Realtime購読テーブル
-12. 年度横断playerId管理方法
-13. 平文バックアップ保存場所
-14. 大会終了時のDBバックアップ要否
-15. Archive indexを公開平文にする範囲
+12. 平文バックアップ保存場所
+13. 大会終了時のDBバックアップ要否
+14. Archive indexを公開平文にする範囲
 
 ---
 

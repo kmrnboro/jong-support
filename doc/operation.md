@@ -242,6 +242,44 @@ supabase db reset
 
 本名やメールアドレスは大会データへ登録しない。
 
+#### Cross-Year playerId Procedure
+
+playerIdは年度やニックネームから生成せず、Git管理外の
+`data/private/player-registry.json`で管理する。
+
+初回のみ台帳を作成する。
+
+```bash
+python tools/manage_players.py init
+```
+
+参加者を登録する前に、現在名と過去名を検索する。
+
+```bash
+python tools/manage_players.py find "ニックネーム"
+```
+
+- 該当者が1名で本人と確認できた場合: 表示されたplayerIdを使用する
+- 該当者が複数の場合: 運営者が本人確認し、自動選択しない
+- 該当者がいない場合: `add`で新しいplayerIdを発行する
+- 同名の別人の場合: 確認後に限り`--allow-duplicate-nickname`を使用する
+
+```bash
+python tools/manage_players.py add "ニックネーム"
+python tools/manage_players.py add "同名の別人" --allow-duplicate-nickname
+```
+
+表示名変更は新規IDを発行せず、既存IDを指定して更新する。
+
+```bash
+python tools/manage_players.py rename <playerId> "新しいニックネーム"
+python tools/manage_players.py validate
+```
+
+変更後は台帳を暗号化された運営者管理ストレージへバックアップする。
+リポジトリ、GitHub Actions、公開Archiveへ台帳を含めない。バックアップから
+復元する場合も`validate`成功後に使用する。
+
 ### 5.6 Confirm Scoring Rules
 
 過去Excelまたは大会ルール表と照合する。
@@ -720,50 +758,30 @@ taikai2026
 - 数字または記号を含む
 - 仲間内情報から推測しにくい
 
-### 16.2 Encrypt
+### 16.2 Validate and Publish
 
 ```bash
-python tools/encrypt_archive.py \
-  data/plain/tournament-2026.json \
-  apps/web/public/archives/tournament-2026-v1.enc
+python tools/publish_archive.py data/plain/tournament-2026.json
 ```
 
-CLI上でパスワードを入力する。
+CLI上でパスワードを入力する。CLIは次を一括して行う。
 
-### 16.3 Verify Decryption
+- Archive 1.0 JSON Schema検証
+- playerId台帳との照合
+- 参加資格と公式順位の整合性検証
+- archiveId・出力ファイル重複の拒否
+- AES-GCM暗号化とメモリ内復号一致確認
+- `apps/web/public/archives/<archiveId>-v<revision>.enc`生成
+- `apps/web/public/archives/index.json`更新
 
-暗号化ツールが自動検証する場合でも、別コマンドで確認する。
+処理途中で失敗した場合、公開indexは更新せず、新規暗号ファイルも残さない。
+既存の暗号Archiveとindex entryは上書きしない。
 
-```bash
-python tools/decrypt_archive.py \
-  apps/web/public/archives/tournament-2026-v1.enc \
-  /tmp/tournament-2026-verify.json
-```
+### 16.3 Browser Verification
 
-元JSONと比較する。
-
-### 16.4 Remove Verification File
-
-```bash
-rm /tmp/tournament-2026-verify.json
-```
-
-### 16.5 Update Archive Index
-
-`apps/web/public/archives/index.json`へ追加する。
-
-例:
-
-```json
-{
-  "archiveId": "2026",
-  "title": "2026年度大会",
-  "date": "2026-07-01",
-  "revision": 1,
-  "file": "archives/tournament-2026-v1.enc",
-  "formatVersion": 1
-}
-```
+ローカルWebを起動し、大会一覧に新しい年度が増え、共有予定のパスワードで
+順位・統計を表示できることを確認する。平文JSONは`data/plain`から移動せず、
+`apps/web/public`へコピーしない。
 
 ---
 

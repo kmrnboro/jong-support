@@ -4,7 +4,7 @@ import type { ArchiveIndexEntry } from "../archive/archiveIndex";
 import { buildArchivePath } from "../archive/routes";
 
 type HomePageProps = {
-  entry: ArchiveIndexEntry;
+  entries: ArchiveIndexEntry[];
 };
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
@@ -13,7 +13,7 @@ const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
   day: "numeric",
 });
 
-export function HomePage({ entry }: HomePageProps) {
+export function HomePage({ entries }: HomePageProps) {
   return (
     <section className="hero" aria-labelledby="page-title">
       <p className="eyebrow">READ-ONLY ARCHIVE</p>
@@ -23,36 +23,42 @@ export function HomePage({ entry }: HomePageProps) {
         Archive Viewerです。
       </p>
 
-      <article className="tournament-card">
-        <div>
-          <p className="card-label">AVAILABLE ARCHIVE</p>
-          <h2>{entry.title}</h2>
-          <dl className="tournament-meta">
-            <div>
-              <dt>開催日</dt>
-              <dd>
-                <time dateTime={entry.date}>
-                  {dateFormatter.format(new Date(entry.date))}
-                </time>
-              </dd>
-            </div>
-            <div>
-              <dt>参加者</dt>
-              <dd>{entry.playerCount}名</dd>
-            </div>
-            <div>
-              <dt>対局</dt>
-              <dd>{entry.gameCount}半荘</dd>
-            </div>
-          </dl>
-        </div>
-        <Link
-          className="primary-link"
-          to={buildArchivePath(entry.archiveId)}
-        >
-          パスワードを入力
-        </Link>
-      </article>
+      {entries.map((entry) => (
+        <article className="tournament-card" key={entry.archiveId}>
+          <div>
+            <p className="card-label">AVAILABLE ARCHIVE</p>
+            <h2>{entry.title}</h2>
+            <dl className="tournament-meta">
+              <div>
+                <dt>開催日</dt>
+                <dd>
+                  <time dateTime={entry.date}>
+                    {dateFormatter.format(new Date(entry.date))}
+                  </time>
+                </dd>
+              </div>
+              <div>
+                <dt>参加者</dt>
+                <dd>{entry.playerCount}名</dd>
+              </div>
+              <div>
+                <dt>対局</dt>
+                <dd>{entry.gameCount}半荘</dd>
+              </div>
+              <div>
+                <dt>サブゲーム</dt>
+                <dd>{entry.hasSubgame ? "あり" : "なし"}</dd>
+              </div>
+            </dl>
+          </div>
+          <Link
+            className="primary-link"
+            to={buildArchivePath(entry.archiveId)}
+          >
+            パスワードを入力
+          </Link>
+        </article>
+      ))}
     </section>
   );
 }

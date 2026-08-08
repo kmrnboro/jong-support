@@ -9,6 +9,7 @@ description = "Administration tools for the jong-support archive viewer"
 requires-python = ">=3.12"
 dependencies = [
   "cryptography>=46.0.0,<50.0.0",
+  "jsonschema>=4.23.0,<5.0.0",
 ]
 
 [project.optional-dependencies]
@@ -23,4 +24,3 @@ include = ["tools*"]
 addopts = "-q"
 pythonpath = ["."]
 testpaths = ["tests"]
-

@@ -4,35 +4,55 @@ import type { TournamentArchive } from "./archive";
 import { createOfficialRanking } from "./ranking";
 
 const archive: TournamentArchive = {
-  schemaVersion: "0.2.0",
+  schemaVersion: "1.0.0",
+  exportedAt: "2026-07-01T12:00:00Z",
   tournament: {
     id: "ranking-test",
     name: "Ranking Test",
     date: "2026-07-01",
+    revision: 1,
   },
   players: [
-    { playerId: "P001", nickname: "Player A" },
-    { playerId: "P002", nickname: "Player B" },
-  ],
-  games: [],
-  subgameResults: [],
-  subgameDataStatus: "sample",
-  officialResults: [
     {
       playerId: "P001",
-      mahjongPoint: 100,
-      mahjongRank: 2,
-      subgamePoint: 20,
-      subgameRank: 1,
+      nickname: "Player A",
+      rankingEligibility: { mahjong: "official", subgame: "official" },
     },
     {
       playerId: "P002",
-      mahjongPoint: -100,
-      mahjongRank: 1,
-      subgamePoint: 10,
-      subgameRank: 2,
+      nickname: "Player B",
+      rankingEligibility: { mahjong: "official", subgame: "official" },
     },
   ],
+  mahjong: {
+    scoring: {
+      ruleId: "stored-final-points",
+      ruleVersion: "1.0.0",
+      parameters: {},
+    },
+    games: [],
+    officialResults: [
+      { playerId: "P001", point: 100, rank: 2 },
+      { playerId: "P002", point: -100, rank: 1 },
+    ],
+  },
+  subgame: {
+    dataStatus: "sample",
+    scoring: {
+      ruleId: "stored-final-points",
+      ruleVersion: "1.0.0",
+      parameters: {},
+    },
+    results: [],
+    officialResults: [
+      { playerId: "P001", point: 20, rank: 1 },
+      { playerId: "P002", point: 10, rank: 2 },
+    ],
+  },
+  exportMetadata: {
+    generator: "test",
+    source: "sample",
+  },
 };
 
 describe("createOfficialRanking", () => {
@@ -57,15 +77,10 @@ describe("createOfficialRanking", () => {
   it("officialResultsが未知のplayerIdを参照している場合は失敗する", () => {
     const invalidArchive: TournamentArchive = {
       ...archive,
-      officialResults: [
-        {
-          playerId: "UNKNOWN",
-          mahjongPoint: 0,
-          mahjongRank: 1,
-          subgamePoint: 0,
-          subgameRank: 1,
-        },
-      ],
+      mahjong: {
+        ...archive.mahjong,
+        officialResults: [{ playerId: "UNKNOWN", point: 0, rank: 1 }],
+      },
     };
 
     expect(() => createOfficialRanking(invalidArchive, "mahjong")).toThrow(

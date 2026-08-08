@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import encryptedArchiveText from "../../public/archives/2026-sample.enc?raw";
+import encryptedArchiveWithoutSubgameText from "../../public/archives/2025-sample-v1.enc?raw";
+import encryptedArchiveText from "../../public/archives/2026-sample-v1.enc?raw";
+import plainArchiveWithoutSubgame from "../../../../tests/fixtures/archive-no-subgame.json";
 import plainArchive from "../../../../tests/fixtures/archive.json";
 import {
   ArchiveDecryptionError,
@@ -13,6 +15,9 @@ import {
 const FIXTURE_PASSWORD = "weekend-mvp-2026";
 const encryptedArchive = JSON.parse(
   encryptedArchiveText,
+) as EncryptedArchiveEnvelope;
+const encryptedArchiveWithoutSubgame = JSON.parse(
+  encryptedArchiveWithoutSubgameText,
 ) as EncryptedArchiveEnvelope;
 
 function replaceCiphertextByte(value: typeof encryptedArchive) {
@@ -36,6 +41,17 @@ describe("decryptArchive", () => {
     const parsed: unknown = JSON.parse(new TextDecoder().decode(plaintext));
 
     expect(parsed).toEqual(plainArchive);
+  });
+
+  it("サブゲームなしの別年度fixtureも復号する", async () => {
+    const plaintext = await decryptArchive(
+      encryptedArchiveWithoutSubgame,
+      FIXTURE_PASSWORD,
+    );
+
+    expect(JSON.parse(new TextDecoder().decode(plaintext))).toEqual(
+      plainArchiveWithoutSubgame,
+    );
   });
 
   it("誤パスワードと改ざんに同じエラーを返す", async () => {

@@ -1,14 +1,29 @@
 {
+  "schemaVersion": "1.0.0",
   "archives": [
     {
       "archiveId": "2026-sample",
       "title": "2026年度大会（匿名化サンプル）",
       "date": "2026-07-01",
       "revision": 1,
-      "file": "archives/2026-sample.enc",
+      "file": "archives/2026-sample-v1.enc",
       "formatVersion": 1,
-      "playerCount": 10,
-      "gameCount": 4
+      "archiveSchemaVersion": "1.0.0",
+      "playerCount": 8,
+      "gameCount": 4,
+      "hasSubgame": true
+    },
+    {
+      "archiveId": "2025-sample",
+      "title": "2025年度大会（匿名化サンプル）",
+      "date": "2025-07-05",
+      "revision": 1,
+      "file": "archives/2025-sample-v1.enc",
+      "formatVersion": 1,
+      "archiveSchemaVersion": "1.0.0",
+      "playerCount": 8,
+      "gameCount": 4,
+      "hasSubgame": false
     }
   ]
 }

@@ -24,7 +24,12 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
 
-      - name: Reject tracked Excel files
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+
+      - name: Reject tracked private source files
         shell: bash
         run: |
           set -euo pipefail
@@ -35,7 +40,14 @@ jobs:
             exit 1
           fi
 
-      - name: Validate public archive files
+          tracked_private="$(git ls-files -- 'data/private/**')"
+          if [[ -n "$tracked_private" ]]; then
+            echo "Private player registry files must not be tracked:"
+            echo "$tracked_private"
+            exit 1
+          fi
+
+      - name: Reject public plaintext JSON
         shell: bash
         run: |
           set -euo pipefail
@@ -46,41 +58,12 @@ jobs:
             exit 1
           fi
 
-          node --input-type=module <<'NODE'
-          import fs from "node:fs";
-          import path from "node:path";
-
-          const indexPath = "apps/web/public/archives/index.json";
-          const index = JSON.parse(fs.readFileSync(indexPath, "utf8"));
-          if (!index || !Array.isArray(index.archives) || index.archives.length === 0) {
-            throw new Error("archives/index.json must contain a non-empty archives array");
-          }
-
-          for (const archive of index.archives) {
-            const isValidEntry =
-              archive &&
-              typeof archive.archiveId === "string" &&
-              typeof archive.title === "string" &&
-              typeof archive.date === "string" &&
-              Number.isInteger(archive.revision) &&
-              archive.formatVersion === 1 &&
-              typeof archive.file === "string" &&
-              archive.file.startsWith("archives/") &&
-              archive.file.endsWith(".enc");
-            if (!isValidEntry) {
-              throw new Error("Archive index contains an invalid entry");
-            }
-
-            const encryptedPath = path.join("apps/web/public", archive.file);
-            if (!fs.existsSync(encryptedPath)) {
-              throw new Error(`Encrypted archive is missing: ${encryptedPath}`);
-            }
-          }
-          NODE
-
       - name: Install dependencies
         working-directory: apps/web
         run: npm ci
+
+      - name: Install Python dependencies
+        run: python -m pip install -e ".[dev]"
 
       - name: Lint
         working-directory: apps/web
@@ -93,6 +76,9 @@ jobs:
       - name: Test
         working-directory: apps/web
         run: npm test
+
+      - name: Test Python tools
+        run: python -m pytest
 
       - name: Build
         working-directory: apps/web
@@ -108,8 +94,8 @@ jobs:
             exit 1
           fi
 
-          if find apps/web/dist \( -path '*/data/raw' -o -path '*/data/raw/*' -o -path '*/data/plain' -o -path '*/data/plain/*' \) -print -quit | grep -q .; then
-            echo "data/raw or data/plain must not be included in the production artifact."
+          if find apps/web/dist \( -path '*/data/raw' -o -path '*/data/raw/*' -o -path '*/data/plain' -o -path '*/data/plain/*' -o -path '*/data/private' -o -path '*/data/private/*' \) -print -quit | grep -q .; then
+            echo "data/raw, data/plain, or data/private must not be included in the production artifact."
             exit 1
           fi
 

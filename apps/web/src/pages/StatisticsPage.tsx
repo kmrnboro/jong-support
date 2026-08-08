@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { buildArchivePath } from "../archive/routes";
 import { PointProgressChart } from "../components/PointProgressChart";
@@ -34,31 +34,21 @@ const seriesColors = [
 ];
 
 export function StatisticsPage({ archive }: StatisticsPageProps) {
-  const { archiveId = "" } = useParams();
   const [visiblePlayerIds, setVisiblePlayerIds] = useState(
     () => new Set(archive.players.map((player) => player.playerId)),
   );
 
-  if (archiveId !== archive.tournament.id) {
-    return (
-      <section className="message-card">
-        <p className="eyebrow">NOT FOUND</p>
-        <h1>大会が見つかりません</h1>
-        <Link className="text-link" to="/">
-          大会トップへ戻る
-        </Link>
-      </section>
-    );
-  }
-
   const mahjongProgressions = calculateMahjongProgressions(
     archive.players,
-    archive.games,
+    archive.mahjong.games,
   );
-  const subgameProgressions = calculateSubgameProgressions(
-    archive.players,
-    archive.subgameResults,
-  );
+  const subgameProgressions =
+    archive.subgame === null
+      ? null
+      : calculateSubgameProgressions(
+          archive.players,
+          archive.subgame.results,
+        );
   const colorByPlayerId = new Map(
     archive.players.map((player, index) => [
       player.playerId,
@@ -68,7 +58,7 @@ export function StatisticsPage({ archive }: StatisticsPageProps) {
   const statistics = createOfficialRanking(archive, "mahjong").map(
     (ranking) => ({
       nickname: ranking.nickname,
-      ...calculatePlayerStatistics(ranking.playerId, archive.games),
+      ...calculatePlayerStatistics(ranking.playerId, archive.mahjong.games),
     }),
   );
 
@@ -94,7 +84,7 @@ export function StatisticsPage({ archive }: StatisticsPageProps) {
         </div>
         <Link
           className="text-link text-link-top"
-          to={buildArchivePath(archiveId)}
+          to={buildArchivePath(archive.tournament.id)}
         >
           公式順位へ戻る
         </Link>
@@ -158,29 +148,33 @@ export function StatisticsPage({ archive }: StatisticsPageProps) {
         />
       </section>
 
-      <section
-        className="content-card chart-card"
-        aria-labelledby="subgame-chart-title"
-      >
-        <div className="section-heading compact-heading">
-          <div>
-            <p className="card-label">SUBGAME PROGRESSION</p>
-            <h2 id="subgame-chart-title">
-              サブゲームpt推移
-              {archive.subgameDataStatus === "sample" ? "（仮）" : ""}
-            </h2>
+      {subgameProgressions === null ? null : (
+        <section
+          className="content-card chart-card"
+          aria-labelledby="subgame-chart-title"
+        >
+          <div className="section-heading compact-heading">
+            <div>
+              <p className="card-label">SUBGAME PROGRESSION</p>
+              <h2 id="subgame-chart-title">
+                サブゲームpt推移
+                {archive.subgame?.dataStatus === "sample" ? "（仮）" : ""}
+              </h2>
+            </div>
           </div>
-        </div>
-        {archive.subgameDataStatus === "sample" ? (
-          <p className="sample-note">画面確認用の仮データを使用しています。</p>
-        ) : null}
-        <PointProgressChart
-          label="サブゲームpt"
-          series={subgameProgressions}
-          visiblePlayerIds={visiblePlayerIds}
-          colorByPlayerId={colorByPlayerId}
-        />
-      </section>
+          {archive.subgame?.dataStatus === "sample" ? (
+            <p className="sample-note">
+              画面確認用の仮データを使用しています。
+            </p>
+          ) : null}
+          <PointProgressChart
+            label="サブゲームpt"
+            series={subgameProgressions}
+            visiblePlayerIds={visiblePlayerIds}
+            colorByPlayerId={colorByPlayerId}
+          />
+        </section>
+      )}
 
       <section className="ranking-card" aria-labelledby="comparison-title">
         <div className="section-heading">

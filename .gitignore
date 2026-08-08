@@ -1,8 +1,11 @@
 data/raw/
 data/plain/
+data/private/
 *.xlsx
 *.decrypted.json
 .env*
+.uv-cache/
+.venv/
 
 node_modules/
 dist/
