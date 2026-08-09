@@ -3,6 +3,7 @@ import {
   Navigate,
   Route,
   Routes,
+  useLocation,
   useParams,
 } from "react-router-dom";
 
@@ -22,9 +23,21 @@ import { ArchivePage } from "./pages/ArchivePage";
 import { ArchiveUnlockPage } from "./pages/ArchiveUnlockPage";
 import { CrossYearStatisticsPage } from "./pages/CrossYearStatisticsPage";
 import { HomePage } from "./pages/HomePage";
+import { MahjongResultEditPage } from "./pages/MahjongResultEditPage";
+import { MahjongResultInputPage } from "./pages/MahjongResultInputPage";
 import { MatchHistoryPage } from "./pages/MatchHistoryPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
+import { TournamentDashboardPage } from "./pages/TournamentDashboardPage";
+import { createSampleTournamentSession } from "./tournament/sampleSession";
+import {
+  closeTournament,
+  correctGame,
+  registerGame,
+  startTournament,
+  type CorrectionInput,
+  type GameInput,
+} from "./tournament/session";
 
 type ArchiveRouteProps = {
   entries: ArchiveIndexEntry[];
@@ -61,14 +74,27 @@ function ArchiveRoute({
 }
 
 export function App() {
+  const location = useLocation();
+  const isTournamentRoute = location.pathname.startsWith(
+    "/prototype/tournament",
+  );
   const [index, setIndex] = useState<ArchiveIndex | null>(null);
   const [indexError, setIndexError] = useState<string | null>(null);
   const [archive, setArchive] = useState<TournamentArchive | null>(null);
   const [archiveSummaries, setArchiveSummaries] = useState<
     ArchiveStatisticsSummary[]
   >([]);
+  const [tournamentSession, setTournamentSession] = useState(
+    createSampleTournamentSession,
+  );
+  const [tournamentMessage, setTournamentMessage] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
+    if (isTournamentRoute) {
+      return;
+    }
     let active = true;
     loadArchiveIndex(`${import.meta.env.BASE_URL}archives/index.json`)
       .then((loadedIndex) => {
@@ -88,7 +114,7 @@ export function App() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [isTournamentRoute]);
 
   const entries = index?.archives ?? [];
 
@@ -100,6 +126,73 @@ export function App() {
       ),
       summarizeArchive(loadedArchive),
     ]);
+  }
+
+  function handleRegisterGame(input: GameInput) {
+    setTournamentSession(registerGame(tournamentSession, input));
+    setTournamentMessage(
+      `${input.roundNumber}回戦・${input.tableNumber}卓を登録しました。`,
+    );
+  }
+
+  function handleCorrectGame(gameId: string, input: CorrectionInput) {
+    setTournamentSession(correctGame(tournamentSession, gameId, input));
+    setTournamentMessage(
+      `${input.roundNumber}回戦・${input.tableNumber}卓を訂正しました。`,
+    );
+  }
+
+  if (isTournamentRoute) {
+    return (
+      <AppLayout>
+        <Routes>
+          <Route
+            path="prototype/tournament"
+            element={
+              <TournamentDashboardPage
+                session={tournamentSession}
+                message={tournamentMessage}
+                onStart={() => {
+                  setTournamentSession(startTournament(tournamentSession));
+                  setTournamentMessage(null);
+                }}
+                onClose={() => {
+                  setTournamentSession(closeTournament(tournamentSession));
+                  setTournamentMessage(null);
+                }}
+              />
+            }
+          />
+          <Route
+            path="prototype/tournament/input"
+            element={
+              tournamentSession.tournament.status === "active" ? (
+                <MahjongResultInputPage
+                  session={tournamentSession}
+                  onRegister={handleRegisterGame}
+                />
+              ) : (
+                <Navigate replace to="/prototype/tournament" />
+              )
+            }
+          />
+          <Route
+            path="prototype/tournament/games/:gameId/edit"
+            element={
+              tournamentSession.tournament.status !== "preparing" ? (
+                <MahjongResultEditPage
+                  session={tournamentSession}
+                  onCorrect={handleCorrectGame}
+                />
+              ) : (
+                <Navigate replace to="/prototype/tournament" />
+              )
+            }
+          />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </AppLayout>
+    );
   }
 
   return (

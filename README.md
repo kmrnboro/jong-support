@@ -178,5 +178,8 @@ Excel、復号済みJSON、`.env` 系ファイルも `.gitignore` の対象で�
 - [要件](doc/requirements.md)
 - [アーキテクチャ](doc/architecture.md)
 - [開発計画](doc/development-plan.md)
+- [Tournament Modeプロトタイプ仕様](doc/tournament-mode-spec.md)
+- [Tournament Modeプロトタイプ開発計画](doc/tournament-mode-development-plan.md)
+- [Tournament Modeプロトタイプレビュー](doc/tournament-mode-prototype-review.md)
 - [オンボーディング](doc/onboarding.md)
 - [週末スプリント計画](doc/weekend-sprint-plan.md)

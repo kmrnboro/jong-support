@@ -2,7 +2,7 @@
 
 - Version: 0.1.0
 - Status: Draft
-- Last Updated: 2026-07-20
+- Last Updated: 2026-08-08
 - Related Documents:
   - `requirements.md`
   - `architecture.md`
@@ -1430,7 +1430,9 @@ Status: Complete (2026-07-28)
 - 実データの公式順位照合
 - 2026年度Archiveの公開
 
-Supabase、Tournament Mode、実際の得点計算関数はこの作業列に含めない。
+Supabase、本番Tournament Mode、実際の得点計算関数はこの作業列に含めない。
+実データに依存しないフロントエンド限定Tournament Modeプロトタイプは、
+`tournament-mode-spec.md`と`tournament-mode-development-plan.md`に従って別ブランチで進める。
 
 ---
 
