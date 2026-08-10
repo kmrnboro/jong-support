@@ -29,11 +29,13 @@ import { MatchHistoryPage } from "./pages/MatchHistoryPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
 import { TournamentDashboardPage } from "./pages/TournamentDashboardPage";
+import { TournamentProgressPage } from "./pages/TournamentProgressPage";
 import { createSampleTournamentSession } from "./tournament/sampleSession";
 import {
   closeTournament,
   correctGame,
   registerGame,
+  resumeTournament,
   startTournament,
   type CorrectionInput,
   type GameInput,
@@ -160,8 +162,16 @@ export function App() {
                   setTournamentSession(closeTournament(tournamentSession));
                   setTournamentMessage(null);
                 }}
+                onResume={() => {
+                  setTournamentSession(resumeTournament(tournamentSession));
+                  setTournamentMessage("結果入力を再開しました。");
+                }}
               />
             }
+          />
+          <Route
+            path="prototype/tournament/progress"
+            element={<TournamentProgressPage session={tournamentSession} />}
           />
           <Route
             path="prototype/tournament/input"

@@ -861,8 +861,13 @@ h2 {
 }
 
 .calculated-rank {
+  display: grid;
+  min-height: 2.1rem;
+  place-items: center;
+  border-radius: 0.45rem;
+  background: #f2e4c5;
   color: #57615d;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 800;
 }
 
@@ -912,6 +917,119 @@ h2 {
   gap: 0.65rem 1rem;
   color: #57615d;
   font-size: 0.85rem;
+}
+
+.result-summary {
+  min-width: 0;
+  padding: 1rem;
+  border: 2px solid #265f50;
+  border-radius: 0.8rem;
+  background: #f7fbf8;
+}
+
+.result-summary h2 {
+  margin-bottom: 0.9rem;
+  font-size: 1.05rem;
+}
+
+.result-summary ol {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result-summary li {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) max-content;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 0.6rem;
+  background: #fff;
+}
+
+.result-rank {
+  color: #173f35;
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.result-player {
+  display: grid;
+  min-width: 0;
+}
+
+.result-player strong {
+  overflow-wrap: anywhere;
+}
+
+.result-player small {
+  margin-top: 0.2rem;
+  color: #737b77;
+}
+
+.result-score {
+  color: #173f35;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.correction-comparison {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  padding: 1rem;
+  place-items: center;
+  background: rgb(24 37 32 / 58%);
+}
+
+.validation-dialog {
+  width: min(100%, 26rem);
+  padding: 1.5rem;
+  border-radius: 0.9rem;
+  background: #fffdf8;
+  box-shadow: 0 1.5rem 4rem rgb(14 26 21 / 35%);
+}
+
+.validation-dialog h2 {
+  margin: 0.45rem 0 0.8rem;
+}
+
+.validation-dialog p:not(.card-label) {
+  color: #57615d;
+  line-height: 1.7;
+}
+
+.validation-dialog .primary-button {
+  width: 100%;
+}
+
+.tournament-admin-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+}
+
+.tournament-admin-card h2 {
+  margin-top: 0.45rem;
+}
+
+.tournament-admin-card p:last-child {
+  margin: 0.5rem 0 0;
+  color: #68716d;
+  font-size: 0.82rem;
+  line-height: 1.6;
 }
 
 .form-error {
@@ -1054,6 +1172,23 @@ h2 {
 
   .current-result-grid {
     grid-template-columns: 1fr;
+  }
+
+  .correction-comparison {
+    grid-template-columns: 1fr;
+  }
+
+  .result-summary li {
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+  }
+
+  .result-score {
+    grid-column: 2;
+  }
+
+  .tournament-admin-card {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 

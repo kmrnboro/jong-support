@@ -5,6 +5,7 @@ type PointProgressChartProps = {
   series: readonly PlayerPointProgression[];
   visiblePlayerIds: ReadonlySet<string>;
   colorByPlayerId: ReadonlyMap<string, string>;
+  includeZero?: boolean;
 };
 
 const pointFormatter = new Intl.NumberFormat("ja-JP", {
@@ -16,6 +17,7 @@ export function PointProgressChart({
   series,
   visiblePlayerIds,
   colorByPlayerId,
+  includeZero = true,
 }: PointProgressChartProps) {
   const visibleSeries = series.filter((item) =>
     visiblePlayerIds.has(item.playerId),
@@ -30,13 +32,19 @@ export function PointProgressChart({
   const margin = { top: 24, right: 24, bottom: 42, left: 62 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
-  const rounds = series[0]?.points.map((point) => point.roundNumber) ?? [0];
+  const rounds = [
+    ...new Set(
+      visibleSeries.flatMap((item) =>
+        item.points.map((point) => point.roundNumber),
+      ),
+    ),
+  ].sort((left, right) => left - right);
   const maxRound = Math.max(...rounds, 1);
   const values = visibleSeries.flatMap((item) =>
     item.points.map((point) => point.point),
   );
-  const rawMin = Math.min(0, ...values);
-  const rawMax = Math.max(0, ...values);
+  const rawMin = Math.min(...(includeZero ? [0, ...values] : values));
+  const rawMax = Math.max(...(includeZero ? [0, ...values] : values));
   const targetStep = Math.max((rawMax - rawMin) / 4, 1);
   const magnitude = 10 ** Math.floor(Math.log10(targetStep));
   const normalizedStep = targetStep / magnitude;
@@ -73,7 +81,7 @@ export function PointProgressChart({
         className="progress-chart"
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label={`${label}の回別累積ポイント推移`}
+        aria-label={`${label}の回別推移`}
       >
         {yTicks.map((tick) => (
           <g key={tick}>
@@ -113,13 +121,15 @@ export function PointProgressChart({
           </g>
         ))}
 
-        <line
-          className="chart-zero-line"
-          x1={margin.left}
-          x2={width - margin.right}
-          y1={y(0)}
-          y2={y(0)}
-        />
+        {includeZero ? (
+          <line
+            className="chart-zero-line"
+            x1={margin.left}
+            x2={width - margin.right}
+            y1={y(0)}
+            y2={y(0)}
+          />
+        ) : null}
 
         {visibleSeries.map((item) => {
           const color = colorByPlayerId.get(item.playerId) ?? "#4f5962";

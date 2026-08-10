@@ -5,8 +5,10 @@ import {
   closeTournament,
   correctGame,
   createLiveRanking,
+  createRawScoreProgressions,
   type GameInput,
   registerGame,
+  resumeTournament,
   startTournament,
 } from "./session";
 
@@ -26,14 +28,16 @@ function activeSession() {
 }
 
 describe("tournament session", () => {
-  it("元状態を変更せず大会を開始・終了する", () => {
+  it("元状態を変更せず大会を開始・入力終了・再開する", () => {
     const preparing = createSampleTournamentSession();
     const active = startTournament(preparing);
     const closed = closeTournament(active);
+    const resumed = resumeTournament(closed);
 
     expect(preparing.tournament.status).toBe("preparing");
     expect(active.tournament.status).toBe("active");
     expect(closed.tournament.status).toBe("closed");
+    expect(resumed.tournament.status).toBe("active");
   });
 
   it("東南西北の結果を登録して暫定順位を作る", () => {
@@ -69,6 +73,20 @@ describe("tournament session", () => {
     });
 
     expect(registered.games).toHaveLength(1);
+  });
+
+  it("登録済み対局から参加者ごとの素点推移を作る", () => {
+    const registered = registerGame(activeSession(), validInput);
+    const progressions = createRawScoreProgressions(registered);
+
+    expect(progressions).toHaveLength(4);
+    expect(progressions[0]).toMatchObject({
+      playerId: "P001",
+      points: [
+        { roundNumber: 0, point: 25_000 },
+        { roundNumber: 1, point: 40_000 },
+      ],
+    });
   });
 
   it("開催状態、参加者、回・卓、素点合計の不正を拒否する", () => {

@@ -1,7 +1,10 @@
+import { useEffect, useRef } from "react";
+
 import {
   calculatePrototypeResults,
   SEAT_LABELS,
   type InitialSeat,
+  type LiveGameResult,
   type TournamentPlayer,
 } from "../tournament/session";
 import type { EditableGameResult } from "./mahjongResultForm";
@@ -14,6 +17,84 @@ type MahjongResultFieldsProps = {
   disabled?: boolean;
   onChange: (results: EditableGameResult[]) => void;
 };
+
+type TournamentResultSummaryProps = {
+  title: string;
+  players: TournamentPlayer[];
+  results: readonly LiveGameResult[];
+};
+
+type ValidationDialogProps = {
+  message: string;
+  onClose: () => void;
+};
+
+export function TournamentResultSummary({
+  title,
+  players,
+  results,
+}: TournamentResultSummaryProps) {
+  const playerNames = new Map(
+    players.map((player) => [player.playerId, player.nickname]),
+  );
+
+  return (
+    <section className="result-summary" aria-label={title}>
+      <h2>{title}</h2>
+      <ol>
+        {[...results]
+          .sort((left, right) => left.rank - right.rank)
+          .map((result) => (
+            <li key={result.initialSeat}>
+              <span className="result-rank">{result.rank}位</span>
+              <span className="result-player">
+                <strong>{playerNames.get(result.playerId)}</strong>
+                <small>開始時 {SEAT_LABELS[result.initialSeat]}</small>
+              </span>
+              <strong className="result-score">
+                {result.rawScore.toLocaleString("ja-JP")}点
+              </strong>
+            </li>
+          ))}
+      </ol>
+    </section>
+  );
+}
+
+export function ValidationDialog({
+  message,
+  onClose,
+}: ValidationDialogProps) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    buttonRef.current?.focus();
+  }, []);
+
+  return (
+    <div className="dialog-backdrop">
+      <section
+        aria-describedby="validation-dialog-message"
+        aria-labelledby="validation-dialog-title"
+        aria-modal="true"
+        className="validation-dialog"
+        role="alertdialog"
+      >
+        <p className="card-label">入力内容を確認してください</p>
+        <h2 id="validation-dialog-title">登録できません</h2>
+        <p id="validation-dialog-message">{message}</p>
+        <button
+          className="primary-button"
+          onClick={onClose}
+          ref={buttonRef}
+          type="button"
+        >
+          OK
+        </button>
+      </section>
+    </div>
+  );
+}
 
 export function MahjongResultFields({
   idPrefix,

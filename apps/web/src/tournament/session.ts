@@ -70,6 +70,13 @@ export type LiveRankingRow = TournamentPlayer & {
   totalPoint: number;
 };
 
+export type RawScoreProgression = TournamentPlayer & {
+  points: Array<{
+    roundNumber: number;
+    point: number;
+  }>;
+};
+
 function requirePositiveInteger(value: number, label: string) {
   if (!Number.isInteger(value) || value < 1) {
     throw new Error(`${label}は1以上の整数で入力してください。`);
@@ -170,6 +177,16 @@ export function closeTournament(session: TournamentSession): TournamentSession {
   };
 }
 
+export function resumeTournament(session: TournamentSession): TournamentSession {
+  if (session.tournament.status !== "closed") {
+    throw new Error("入力終了中の大会だけ再開できます。");
+  }
+  return {
+    ...session,
+    tournament: { ...session.tournament, status: "active" },
+  };
+}
+
 export function registerGame(
   session: TournamentSession,
   input: GameInput,
@@ -258,4 +275,30 @@ export function createLiveRanking(
         left.playerId.localeCompare(right.playerId),
     )
     .map((row, index) => ({ ...row, rank: index + 1 }));
+}
+
+export function createRawScoreProgressions(
+  session: TournamentSession,
+): RawScoreProgression[] {
+  const games = [...session.games].sort(
+    (left, right) =>
+      left.roundNumber - right.roundNumber || left.tableNumber - right.tableNumber,
+  );
+
+  return session.players
+    .map((player) => ({
+      ...player,
+      points: [
+        { roundNumber: 0, point: session.tournament.startingScore },
+        ...games.flatMap((game) => {
+          const result = game.results.find(
+            (candidate) => candidate.playerId === player.playerId,
+          );
+          return result === undefined
+            ? []
+            : [{ roundNumber: game.roundNumber, point: result.rawScore }];
+        }),
+      ],
+    }))
+    .filter((player) => player.points.length > 1);
 }

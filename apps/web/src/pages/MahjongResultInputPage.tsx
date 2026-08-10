@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 import {
   MahjongResultFields,
+  TournamentResultSummary,
+  ValidationDialog,
 } from "../components/MahjongResultFields";
 import {
   createEmptyGameResults,
@@ -10,6 +12,7 @@ import {
   type EditableGameResult,
 } from "../components/mahjongResultForm";
 import {
+  calculatePrototypeResults,
   registerGame,
   type GameInput,
   type TournamentSession,
@@ -61,6 +64,13 @@ export function MahjongResultInputPage({
     }
   }
 
+  const confirmationResults = confirming
+    ? calculatePrototypeResults(
+        session.tournament.startingScore,
+        parseGameResults(results),
+      )
+    : [];
+
   return (
     <section className="page-stack tournament-mode narrow-page">
       <header>
@@ -101,22 +111,27 @@ export function MahjongResultInputPage({
           </label>
         </div>
 
-        <MahjongResultFields
-          disabled={confirming}
-          idPrefix="register"
-          players={session.players}
-          results={results}
-          startingScore={session.tournament.startingScore}
-          onChange={setResults}
-        />
+        {confirming ? (
+          <TournamentResultSummary
+            players={session.players}
+            results={confirmationResults}
+            title="最終着順と素点"
+          />
+        ) : (
+          <MahjongResultFields
+            idPrefix="register"
+            players={session.players}
+            results={results}
+            startingScore={session.tournament.startingScore}
+            onChange={setResults}
+          />
+        )}
 
         {confirming ? (
           <p className="confirmation-note">
             回・卓、参加者、素点を読み合わせてから登録してください。
           </p>
         ) : null}
-        {error ? <p className="form-error" role="alert">{error}</p> : null}
-
         <div className="form-actions">
           {confirming ? (
             <button className="secondary-button" type="button" onClick={() => setConfirming(false)}>
@@ -128,6 +143,9 @@ export function MahjongResultInputPage({
           </button>
         </div>
       </form>
+      {error ? (
+        <ValidationDialog message={error} onClose={() => setError(null)} />
+      ) : null}
     </section>
   );
 }

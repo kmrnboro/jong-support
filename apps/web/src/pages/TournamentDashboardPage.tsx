@@ -10,12 +10,13 @@ type TournamentDashboardPageProps = {
   message: string | null;
   onStart: () => void;
   onClose: () => void;
+  onResume: () => void;
 };
 
 const statusLabels = {
   preparing: "開始前",
   active: "開催中",
-  closed: "終了",
+  closed: "入力終了",
 } as const;
 
 function formatPoint(point: number) {
@@ -27,6 +28,7 @@ export function TournamentDashboardPage({
   message,
   onStart,
   onClose,
+  onResume,
 }: TournamentDashboardPageProps) {
   const ranking = createLiveRanking(session);
   const playerNames = new Map(
@@ -46,20 +48,13 @@ export function TournamentDashboardPage({
           </p>
         </div>
         <div className="page-actions tournament-actions">
-          {session.tournament.status === "preparing" ? (
-            <button className="primary-button" type="button" onClick={onStart}>
-              大会を開始
-            </button>
-          ) : null}
+          <Link className="text-link" to="/prototype/tournament/progress">
+            素点推移を見る
+          </Link>
           {session.tournament.status === "active" ? (
-            <>
-              <Link className="primary-link" to="/prototype/tournament/input">
-                結果を入力
-              </Link>
-              <button className="secondary-button" type="button" onClick={onClose}>
-                入力を終了
-              </button>
-            </>
+            <Link className="primary-link" to="/prototype/tournament/input">
+              結果を入力
+            </Link>
           ) : null}
         </div>
       </header>
@@ -70,6 +65,31 @@ export function TournamentDashboardPage({
         この画面はブラウザメモリだけで動く操作確認用です。再読み込みすると初期化されます。
         表示ptは正式な大会得点ではありません。
       </p>
+
+      <article className="content-card tournament-admin-card">
+        <div>
+          <p className="card-label">ORGANIZER CONTROL</p>
+          <h2>運営操作</h2>
+          <p>
+            入力状態の変更は運営画面だけに置きます。プロトタイプでは認証を省略しています。
+          </p>
+        </div>
+        {session.tournament.status === "preparing" ? (
+          <button className="primary-button" type="button" onClick={onStart}>
+            大会を開始
+          </button>
+        ) : null}
+        {session.tournament.status === "active" ? (
+          <button className="secondary-button" type="button" onClick={onClose}>
+            入力を終了
+          </button>
+        ) : null}
+        {session.tournament.status === "closed" ? (
+          <button className="primary-button" type="button" onClick={onResume}>
+            入力を再開
+          </button>
+        ) : null}
+      </article>
 
       <article className="ranking-card">
         <div className="section-heading">

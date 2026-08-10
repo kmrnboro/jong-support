@@ -2,7 +2,7 @@
 
 - Version: 0.1.0
 - Status: Draft for Review
-- Last Updated: 2026-08-08
+- Last Updated: 2026-08-10
 - Related: `requirements.md`, `architecture.md`, `operation.md`
 
 ## 1. Purpose
@@ -64,7 +64,7 @@ Supabaseや本番用得点計算を実装する前に、大会中の結果入力
 | `active` | 開催中 | 可 | 可 |
 | `closed` | 入力終了 | 不可 | 可 |
 
-状態変更はOrganizer操作とする。
+状態変更はOrganizer操作とし、`closed`から`active`へ入力を再開できる。
 
 ## 6. Screens and Routes
 
@@ -75,6 +75,9 @@ Supabaseや本番用得点計算を実装する前に、大会中の結果入力
 /#/prototype/tournament/input
   麻雀結果入力・登録前確認
 
+/#/prototype/tournament/progress
+  参加者別の素点推移
+
 /#/prototype/tournament/games/:gameId/edit
   結果訂正
 ```
@@ -84,7 +87,8 @@ Supabaseや本番用得点計算を実装する前に、大会中の結果入力
 - 大会名、状態、登録済み対局数
 - 暫定麻雀順位
 - 最近の対局
-- 結果入力と状態変更への導線
+- 結果入力、素点推移、運営操作への導線
+- 運営操作として入力終了・再開
 
 ### 6.2 Result Input
 
@@ -95,6 +99,8 @@ Supabaseや本番用得点計算を実装する前に、大会中の結果入力
 - 入力エラー、登録前確認、登録成功
 
 入力中に行を着順へ並べ替えない。着順は素点から算出して各行の横に表示する。
+登録前確認では入力欄より最終着順と素点を優先して表示する。
+検証失敗時は理由とOKボタンをダイアログへ表示する。
 
 ### 6.3 Result Correction
 
@@ -102,6 +108,14 @@ Supabaseや本番用得点計算を実装する前に、大会中の結果入力
 - 訂正理由
 - 確定前の変更比較
 - 訂正履歴
+
+確定前は訂正前・訂正後の着順と素点を同じ位置で比較できるようにする。
+
+### 6.4 Raw Score Progression
+
+- 登録済み対局がある全参加者の素点推移
+- 参加者ごとの表示ON/OFF
+- 訂正後は現在有効な結果から再生成
 
 ## 7. User Flows
 
@@ -139,6 +153,9 @@ Supabaseや本番用得点計算を実装する前に、大会中の結果入力
 | TM-FR-008 | 訂正前後と理由をメモリ内で確認できる |
 | TM-FR-009 | リロード時に初期状態へ戻る |
 | TM-FR-010 | 素点合計が「持ち点 × 4」でない結果の登録・訂正を拒否する |
+| TM-FR-011 | 入力終了後にOrganizerが結果入力を再開できる |
+| TM-FR-012 | 検証失敗理由をOK付きダイアログへ表示する |
+| TM-FR-013 | 別ページで参加者ごとの素点推移を比較できる |
 
 ## 9. Prototype State
 
@@ -167,9 +184,11 @@ DB用ID形式、監査ログSchema、日時の正本はプロトタイプで確�
 
 - `startTournament`
 - `closeTournament`
+- `resumeTournament`
 - `registerGame`
 - `correctGame`
 - `createLiveRanking`
+- `createRawScoreProgressions`
 
 拒否するのは操作成立に必要な次の条件だけとする。
 
@@ -211,19 +230,24 @@ raw scores → PrototypeScoringAdapter → rank / finalPoint preview
 - タップ領域とフォーカス表示を確保する
 - エラーを色だけで表現しない
 - 登録前確認と登録成功を区別する
+- 確認画面では最終着順と素点を最も目立たせる
+- 訂正画面では訂正前後を同時に表示する
 - UI・状態管理ライブラリを追加しない
 - 実名、認証情報、パスワード、実大会データを扱わない
 - 外部送信・永続化を行わない
 
 ## 14. Acceptance Criteria
 
-- サンプル大会を開始・終了できる
+- サンプル大会を開始・入力終了・再開できる
 - スマートフォン幅で1卓4名分を登録できる
 - 入力内容とサンプル計算結果を登録前に確認できる
+- 検証失敗理由をダイアログで確認できる
 - 「持ち点 × 4」以外では登録・訂正できない
 - 登録後に暫定順位と対局一覧が変化する
 - 同じ回・卓の二重登録を拒否する
 - 理由付きで結果を訂正し、順位を再計算できる
+- 訂正前後の順位と素点を同時に確認できる
+- 別ページで参加者ごとの素点推移を表示できる
 - リロードで初期化する
 - Domain処理がReactへ依存しない
 - lint、typecheck、test、buildが成功する

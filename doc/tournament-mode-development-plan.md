@@ -1,8 +1,8 @@
 # Tournament Mode Prototype Development Plan
 
 - Version: 0.1.0
-- Status: Implemented - User Review Pending
-- Last Updated: 2026-08-08
+- Status: Review Round 1 Changes Implemented
+- Last Updated: 2026-08-10
 - Specification: `tournament-mode-spec.md`
 
 ## 1. Objective
@@ -62,6 +62,7 @@ apps/web/src/
 | P3 | W-11D | Result Input | ユーザー操作レビュー必須 |
 | P4 | W-11E | Correction | ユーザー操作レビュー必須 |
 | P5 | W-11F | Responsive・レビュー記録 | 最終レビュー |
+| P6 | W-11G | スマホレビュー指摘対応 | 再レビュー必須 |
 
 ## 6. W-11A: Specification and Plan
 
@@ -259,3 +260,13 @@ docs: record tournament prototype review
 4. Realtime、再取得、複数端末模擬大会
 
 本番要件と一致するDomain処理だけを残し、仮計算や役割切替は削除・置換する。
+
+## 16. W-11G: Smartphone Review Follow-up
+
+- 登録確認で最終着順と素点を強調する
+- 検証失敗理由をOK付きダイアログへ表示する
+- 訂正前後の着順と素点を並べて表示する
+- 参加者別の素点推移ページを追加する
+- 運営操作から入力終了後に再開できるようにする
+
+W-11G反映版をスマートフォンで再レビューする。

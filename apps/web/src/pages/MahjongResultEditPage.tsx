@@ -3,12 +3,15 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 import {
   MahjongResultFields,
+  TournamentResultSummary,
+  ValidationDialog,
 } from "../components/MahjongResultFields";
 import {
   parseGameResults,
   type EditableGameResult,
 } from "../components/mahjongResultForm";
 import {
+  calculatePrototypeResults,
   correctGame,
   INITIAL_SEATS,
   SEAT_LABELS,
@@ -81,6 +84,12 @@ export function MahjongResultEditPage({
   const playerNames = new Map(
     session.players.map((player) => [player.playerId, player.nickname]),
   );
+  const correctedResults = confirming
+    ? calculatePrototypeResults(
+        session.tournament.startingScore,
+        parseGameResults(results),
+      )
+    : [];
 
   return (
     <section className="page-stack tournament-mode narrow-page">
@@ -92,20 +101,25 @@ export function MahjongResultEditPage({
         <h1>{confirming ? "訂正内容を確認" : "対局結果を訂正"}</h1>
       </header>
 
-      <article className="current-result">
-        <h2>現在の登録（revision {game.revision}）</h2>
-        <div className="current-result-grid">
-          {INITIAL_SEATS.map((seat) => {
-            const result = game.results.find((candidate) => candidate.initialSeat === seat);
-            return (
-              <span key={seat}>
-                <strong>{SEAT_LABELS[seat]}</strong> {result ? playerNames.get(result.playerId) : "—"}{" "}
-                {result?.rawScore.toLocaleString("ja-JP")}点
-              </span>
-            );
-          })}
-        </div>
-      </article>
+      {!confirming ? (
+        <article className="current-result">
+          <h2>現在の登録（revision {game.revision}）</h2>
+          <div className="current-result-grid">
+            {INITIAL_SEATS.map((seat) => {
+              const result = game.results.find(
+                (candidate) => candidate.initialSeat === seat,
+              );
+              return (
+                <span key={seat}>
+                  <strong>{SEAT_LABELS[seat]}</strong>{" "}
+                  {result ? playerNames.get(result.playerId) : "—"}{" "}
+                  {result?.rawScore.toLocaleString("ja-JP")}点
+                </span>
+              );
+            })}
+          </div>
+        </article>
+      ) : null}
 
       <form className="tournament-form" onSubmit={handleSubmit}>
         <div className="round-fields">
@@ -119,14 +133,28 @@ export function MahjongResultEditPage({
           </label>
         </div>
 
-        <MahjongResultFields
-          disabled={confirming}
-          idPrefix="correct"
-          players={session.players}
-          results={results}
-          startingScore={session.tournament.startingScore}
-          onChange={setResults}
-        />
+        {confirming ? (
+          <div className="correction-comparison">
+            <TournamentResultSummary
+              players={session.players}
+              results={game.results}
+              title={`訂正前（revision ${game.revision}）`}
+            />
+            <TournamentResultSummary
+              players={session.players}
+              results={correctedResults}
+              title={`訂正後（revision ${game.revision + 1}）`}
+            />
+          </div>
+        ) : (
+          <MahjongResultFields
+            idPrefix="correct"
+            players={session.players}
+            results={results}
+            startingScore={session.tournament.startingScore}
+            onChange={setResults}
+          />
+        )}
 
         <label className="reason-field">
           訂正理由
@@ -139,8 +167,6 @@ export function MahjongResultEditPage({
         </label>
 
         {confirming ? <p className="confirmation-note">変更前後と訂正理由を確認してください。元の記録は履歴に残ります。</p> : null}
-        {error ? <p className="form-error" role="alert">{error}</p> : null}
-
         <div className="form-actions">
           {confirming ? (
             <button className="secondary-button" type="button" onClick={() => setConfirming(false)}>
@@ -152,6 +178,9 @@ export function MahjongResultEditPage({
           </button>
         </div>
       </form>
+      {error ? (
+        <ValidationDialog message={error} onClose={() => setError(null)} />
+      ) : null}
     </section>
   );
 }

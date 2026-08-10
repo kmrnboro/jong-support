@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { buildArchivePath } from "../archive/routes";
+import { POINT_SERIES_COLORS } from "../components/chartColors";
 import { PointProgressChart } from "../components/PointProgressChart";
 import type { TournamentArchive } from "../domain/archive";
 import {
@@ -18,19 +19,6 @@ const percentFormatter = new Intl.NumberFormat("ja-JP", {
   style: "percent",
   maximumFractionDigits: 1,
 });
-
-const seriesColors = [
-  "#176b5b",
-  "#b15f2a",
-  "#4467a8",
-  "#9a4770",
-  "#6d7d28",
-  "#754c9c",
-  "#a53e38",
-  "#247990",
-  "#8a681d",
-  "#4f5962",
-];
 
 export function StatisticsPage({ archive }: StatisticsPageProps) {
   const [visiblePlayerIds, setVisiblePlayerIds] = useState(
@@ -51,7 +39,7 @@ export function StatisticsPage({ archive }: StatisticsPageProps) {
   const colorByPlayerId = new Map(
     archive.players.map((player, index) => [
       player.playerId,
-      seriesColors[index % seriesColors.length],
+      POINT_SERIES_COLORS[index % POINT_SERIES_COLORS.length],
     ]),
   );
   const statistics = archive.players
@@ -119,7 +107,8 @@ export function StatisticsPage({ archive }: StatisticsPageProps) {
               <span
                 className="series-color"
                 style={{
-                  backgroundColor: seriesColors[index % seriesColors.length],
+                  backgroundColor:
+                    POINT_SERIES_COLORS[index % POINT_SERIES_COLORS.length],
                 }}
                 aria-hidden="true"
               />
