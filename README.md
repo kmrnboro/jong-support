@@ -1,11 +1,14 @@
 # jong-support
 
-リアル麻雀大会の過去結果を閲覧する Archive Viewer です。
+リアル麻雀大会の過去結果を閲覧するArchive Viewerと、大会運営フローを確認する
+フロントエンド限定プロトタイプです。
 
 現在は週末MVPの暗号化Archive Viewerとして、ブラウザ内でArchiveを復号し、
 匿名化サンプル大会のトップ、部門別順位、比較統計を閲覧できます。パスワードは
-画面のメモリ内だけで扱い、送信・永続化しません。大会中の入力機能や
-Supabase連携は、このスコープには含みません。
+画面のメモリ内だけで扱い、送信・永続化しません。大会運営モードもブラウザメモリ
+だけで動作し、正式得点計算・認証・Supabase連携はまだ含みません。
+
+画面上部の「結果表示」「大会運営」で、2つのモードをいつでも切り替えられます。
 
 表示内容:
 
@@ -42,7 +45,8 @@ npm run dev
 `http://localhost:5173/jong-support/` をブラウザで開きます。
 ルーティングにはHash Routerを使用するため、
 順位画面は `/jong-support/#/archive/<archiveId>`、比較統計は
-`/jong-support/#/archive/<archiveId>/statistics` 形式です。
+`/jong-support/#/archive/<archiveId>/statistics`、大会運営は
+`/jong-support/#/prototype/tournament` 形式です。
 
 2年度分の匿名化互換fixtureを画面で確認する場合のパスワードは
 `weekend-mvp-2026` です。これはテスト専用であり、実大会では使用しないでください。

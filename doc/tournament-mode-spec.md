@@ -68,6 +68,9 @@ Supabaseや本番用得点計算を実装する前に、大会中の結果入力
 
 ## 6. Screens and Routes
 
+共通ヘッダーの「結果表示」「大会運営」から、Archive Viewerと大会運営モードを
+相互に切り替えられる。
+
 ```text
 /#/prototype/tournament
   大会ダッシュボード
